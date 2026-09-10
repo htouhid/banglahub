@@ -1,0 +1,16 @@
+<section class="auth-page" [attr.aria-busy]="auth.initializing() || auth.busy()">
+  <h1>My Account</h1>
+  @if (auth.initializing()) {
+    <p role="status">Checking your session…</p>
+  } @else if (auth.user(); as user) {
+    <p class="email">Welcome, {{ user.email || 'Bangla Hub member' }}</p>
+    <button type="button" [disabled]="auth.busy()" (click)="auth.logout()">
+      {{ auth.busy() ? 'Signing out…' : 'Sign Out' }}
+    </button>
+  } @else {
+    <p>You are not signed in.</p>
+    <a routerLink="/sign-in">Sign in to your account</a>
+  }
+  @if (auth.error()) { <p class="error" role="alert">{{ auth.error() }}</p> }
+  @if (auth.success()) { <p role="status">{{ auth.success() }}</p> }
+</section>

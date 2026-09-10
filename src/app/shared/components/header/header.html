@@ -1,0 +1,40 @@
+<header class="site-header">
+  <div class="header-row">
+    <button class="menu-button" type="button" aria-label="Toggle navigation" aria-controls="header-navigation"
+      [attr.aria-expanded]="menuOpen()" (click)="menuOpen.set(!menuOpen())">
+      <span></span><span></span><span></span>
+    </button>
+    <a class="brand" routerLink="/" aria-label="Bangla Hub home" (click)="menuOpen.set(false)">
+      <span class="brand-mark" aria-hidden="true"></span>BANGLA HUB
+    </a>
+    <nav id="header-navigation" aria-label="Main navigation" [class.open]="menuOpen()">
+      @for (link of links; track link.path) {
+        <a [routerLink]="link.path" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }"
+          ariaCurrentWhenActive="page" (click)="menuOpen.set(false)">{{ link.label }}</a>
+      }
+    </nav>
+    <div class="search">
+      <svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="10" cy="10" r="6.5"/><path d="m15 15 5 5"/></svg>
+      <input type="search" aria-label="Search businesses, events, or people (coming soon)"
+        placeholder="Search businesses, events, or people..." disabled title="Search is coming soon" />
+    </div>
+    <button class="location" type="button" disabled title="Location selection is coming soon">
+      <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M19 10c0 5-7 11-7 11S5 15 5 10a7 7 0 1 1 14 0Z"/><circle cx="12" cy="10" r="2"/></svg>
+      Your Location
+    </button>
+    <div class="account-actions">
+      @if (auth.initializing()) {
+        <span class="loading" role="status">Loading account…</span>
+      } @else if (auth.user()) {
+        <a class="account-link" routerLink="/account">My Account</a>
+        <button class="primary" type="button" [disabled]="auth.busy()" (click)="auth.logout()">
+          {{ auth.busy() ? 'Please wait…' : 'Sign Out' }}
+        </button>
+      } @else {
+        <a class="account-link" routerLink="/sign-in">Sign In</a>
+        <a class="primary" routerLink="/sign-up">Sign Up</a>
+      }
+    </div>
+  </div>
+  @if (auth.error()) { <p class="auth-error" role="alert">{{ auth.error() }}</p> }
+</header>

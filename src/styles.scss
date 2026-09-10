@@ -1,0 +1,5 @@
+@use './styles/theme' as theme;
+
+* { box-sizing: border-box; }
+body { margin: 0; background: theme.$background; color: theme.$text-primary; font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; -webkit-font-smoothing: antialiased; }
+a:focus-visible, button:focus-visible, input:focus-visible { outline: 3px solid theme.$focus-color; outline-offset: 3px; }

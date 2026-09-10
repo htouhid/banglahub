@@ -1,0 +1,8 @@
+@use '../auth-page';
+@use '../../../styles/theme' as theme;
+.email { overflow-wrap: anywhere; }
+a { color: theme.$primary-red; }
+button { background: theme.$primary-red; color: theme.$background; border: 0; border-radius: 24px; padding: 14px 24px; font: inherit; font-weight: 600; cursor: pointer; }
+button:hover:not(:disabled) { background: theme.$primary-red-hover; }
+button:disabled { opacity: 0.6; cursor: wait; }
+.error { color: theme.$error-text; }

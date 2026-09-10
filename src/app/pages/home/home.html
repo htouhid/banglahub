@@ -1,0 +1,29 @@
+<section class="hero" aria-labelledby="hero-heading">
+  <span class="eyebrow">LOCAL CONNECTIONS. SHARED ROOTS.</span>
+  <h1 id="hero-heading">Discover your<br class="desktop-break" /> Bangla community</h1>
+  <p>Find local businesses, events, jobs, services, and people near you.</p>
+  <form class="search-bar" role="search" (submit)="search($event)">
+    <div class="search-field">
+      <label for="community-search">What are you looking for?</label>
+      <input id="community-search" name="query" type="search" placeholder="Search businesses, services, events..." />
+    </div>
+    <div class="location-field">
+      <label for="community-location">Your Location</label>
+      <input id="community-location" name="location" type="text" placeholder="Your Location" autocomplete="address-level2" />
+    </div>
+    <button type="submit">Search</button>
+  </form>
+  @if (searchMessage()) { <p class="search-message" role="status">{{ searchMessage() }}</p> }
+</section>
+<section class="categories" aria-labelledby="categories-heading">
+  <div class="section-heading"><h2 id="categories-heading">Explore your community</h2><p>A little closer to everything you need.</p></div>
+  <ul class="category-grid">
+    @for (category of categories; track category; let index = $index) {
+      <li class="category-card">
+        <span class="category-mark" aria-hidden="true">{{ ['R', 'G', 'S', 'E', 'J', 'R'][index] }}</span>
+        <h3>{{ category }}</h3>
+        <span class="coming-soon">Coming soon</span>
+      </li>
+    }
+  </ul>
+</section>

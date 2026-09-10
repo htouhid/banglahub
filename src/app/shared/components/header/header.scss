@@ -1,0 +1,44 @@
+@use '../../../../styles/theme' as theme;
+
+:host { display: block; }
+.site-header { background: theme.$background; border-bottom: 1px solid theme.$border-color; }
+.header-row { min-height: 72px; padding: 12px 24px; display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
+a { text-decoration: none; color: theme.$text-primary; }
+button, input { font: inherit; }
+.menu-button { width: 36px; height: 40px; flex-shrink: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; border: 0; background: transparent; cursor: pointer; }
+.menu-button span { width: 19px; height: 2px; background: theme.$text-primary; border-radius: 2px; }
+.brand { display: flex; gap: 9px; align-items: center; color: theme.$primary-red; font-weight: 900; font-size: 21px; letter-spacing: -0.8px; white-space: nowrap; }
+.brand-mark { width: 20px; height: 24px; border: 5px solid theme.$primary-red; border-radius: 6px 6px 10px 10px; transform: rotate(-8deg); }
+nav { display: flex; gap: 18px; align-items: center; }
+nav a { font-size: 14px; font-weight: 600; padding: 10px 0; }
+nav a:hover, nav a.active { color: theme.$primary-red; }
+.search { flex: 1; min-width: 180px; display: flex; align-items: center; gap: 8px; background: theme.$surface-muted; border: 1px solid theme.$border-color; border-radius: 24px; padding: 11px 14px; }
+svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.8; flex-shrink: 0; }
+input { min-width: 0; width: 100%; border: 0; background: transparent; font-size: 13px; }
+input:disabled { opacity: 1; color: theme.$text-secondary; cursor: not-allowed; }
+.location { display: flex; gap: 6px; align-items: center; padding: 0; background: none; border: 0; color: theme.$text-secondary; white-space: nowrap; font-size: 13px; }
+.account-actions { display: flex; align-items: center; gap: 16px; margin-left: auto; }
+.account-link { font-size: 14px; font-weight: 700; white-space: nowrap; }
+.primary { background: theme.$primary-red; border: 0; color: theme.$background; border-radius: 24px; padding: 12px 18px; font-size: 14px; font-weight: 700; white-space: nowrap; cursor: pointer; }
+.primary:hover { background: theme.$primary-red-hover; }
+.primary:disabled { opacity: 0.6; cursor: wait; }
+.loading { color: theme.$text-secondary; font-size: 12px; }
+.auth-error { margin: 0; padding: 10px 24px; background: theme.$error-background; color: theme.$error-text; font-size: 13px; overflow-wrap: anywhere; }
+@media (max-width: 1399px) {
+  .header-row { gap: 14px; }
+  nav { display: none; order: 5; width: 100%; flex-wrap: wrap; padding: 8px 0; }
+  nav.open { display: flex; }
+}
+@media (max-width: 767px) {
+  .header-row { padding: 14px 16px; gap: 10px; }
+  .search { order: 3; flex-basis: 100%; }
+  .location { order: 4; padding: 4px; }
+  .brand { font-size: 19px; }
+  .brand-mark { display: none; }
+  .account-actions { gap: 10px; }
+  .account-link, .primary { font-size: 12px; }
+  .primary { padding: 10px 12px; }
+}
+@media (max-width: 380px) {
+  .account-actions { flex-basis: 100%; justify-content: flex-end; }
+}

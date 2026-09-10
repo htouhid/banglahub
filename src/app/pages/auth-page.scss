@@ -1,0 +1,4 @@
+@use '../../styles/theme' as theme;
+.auth-page { max-width: 488px; margin: auto; padding: 56px 24px; }
+h1 { font-size: clamp(28px, 5vw, 36px); letter-spacing: -1px; margin: 0 0 12px; }
+p { color: theme.$text-secondary; line-height: 1.6; margin-bottom: 28px; }

@@ -1,0 +1,6 @@
+@use '../styles/theme' as theme;
+
+:host { display: flex; flex-direction: column; min-height: 100vh; min-height: 100dvh; }
+main { flex: 1; min-width: 0; }
+.skip-link { position: absolute; left: 16px; top: -60px; z-index: 10; padding: 12px; background: theme.$background; color: theme.$primary-red; }
+.skip-link:focus { top: 8px; }

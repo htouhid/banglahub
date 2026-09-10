@@ -1,0 +1,32 @@
+@use '../../../styles/theme' as theme;
+:host { display: block; }
+.hero { text-align: center; padding: 76px 24px 64px; background: theme.$surface-muted; border-bottom: 1px solid theme.$border-color; }
+.eyebrow { color: theme.$primary-red; font-size: 12px; font-weight: 800; letter-spacing: 2px; }
+h1 { font-size: clamp(36px, 5vw, 64px); letter-spacing: -2px; line-height: 1.1; margin: 20px auto; max-width: 850px; }
+.hero > p { color: theme.$text-secondary; line-height: 1.6; font-size: 17px; }
+.search-bar { display: flex; align-items: center; gap: 20px; text-align: left; max-width: 900px; margin: 32px auto 0; padding: 14px; background: theme.$background; border: 1px solid theme.$border-color; border-radius: 16px; box-shadow: 0 8px 24px #00000006; }
+.search-field { flex: 2; min-width: 0; padding-left: 8px; }
+.location-field { flex: 1; min-width: 0; border-left: 1px solid theme.$border-color; padding-left: 20px; }
+label { display: block; font-size: 12px; font-weight: 700; margin-bottom: 5px; }
+input { width: 100%; min-width: 0; padding: 6px 0; border: 0; background: transparent; font: inherit; font-size: 14px; color: theme.$text-primary; }
+input::placeholder { color: theme.$text-secondary; }
+button { padding: 16px 30px; border: 0; border-radius: 10px; background: theme.$primary-red; color: theme.$background; font: inherit; font-weight: 700; cursor: pointer; }
+button:hover { background: theme.$primary-red-hover; }
+.categories { max-width: 1240px; margin: auto; padding: 48px 24px 72px; }
+h2 { font-size: 26px; letter-spacing: -0.6px; margin: 0 0 8px; }
+.section-heading p { color: theme.$text-secondary; margin: 0; line-height: 1.6; }
+.category-grid { list-style: none; padding: 0; display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 16px; margin: 28px 0 0; }
+.category-card { text-align: center; border: 1px solid theme.$border-color; border-radius: 16px; padding: 24px 12px; background: theme.$background; }
+.category-mark { display: grid; place-items: center; width: 52px; height: 52px; margin: auto; border-radius: 16px; background: theme.$surface-muted; color: theme.$primary-red; font-size: 24px; font-weight: 800; }
+h3 { margin: 18px 0 8px; font-size: 16px; }
+.coming-soon { color: theme.$text-secondary; font-size: 12px; }
+@media (max-width: 900px) { .category-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (max-width: 600px) {
+  .hero { padding: 48px 20px; }
+  .desktop-break { display: none; }
+  .search-bar { flex-direction: column; align-items: stretch; gap: 16px; padding: 20px; }
+  .search-field, .location-field { padding: 0; border: 0; }
+  input { font-size: 16px; }
+  .category-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .categories { padding: 36px 20px 48px; }
+}

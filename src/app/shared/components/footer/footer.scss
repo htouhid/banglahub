@@ -1,0 +1,7 @@
+@use '../../../../styles/theme' as theme;
+
+footer { display: flex; justify-content: space-between; align-items: center; gap: 20px; flex-wrap: wrap; padding: 28px clamp(20px, 5vw, 72px); border-top: 1px solid theme.$border-color; background: theme.$surface-muted; color: theme.$text-secondary; font-size: 13px; }
+p { margin: 0; }
+nav { display: flex; flex-wrap: wrap; gap: 24px; }
+a { color: theme.$text-secondary; text-decoration: none; }
+a:hover { color: theme.$primary-red; text-decoration: underline; }
