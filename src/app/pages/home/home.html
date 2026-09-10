@@ -21,7 +21,7 @@
   <ul class="category-grid">
     @for (category of categories; track category.title) {
       <li class="category-card">
-        <img [src]="'images/' + category.image + '.svg'" alt="" width="480" height="280" loading="lazy" decoding="async" />
+        <img [src]="'images/' + category.image + '.png'" alt="" width="480" height="280" loading="lazy" decoding="async" />
         <div class="category-copy"><span class="category-icon" aria-hidden="true">{{ category.icon }}</span><h3>{{ category.title }}</h3><p>{{ category.description }}</p></div>
       </li>
     }
