@@ -1,29 +1,50 @@
 <section class="hero" aria-labelledby="hero-heading">
-  <span class="eyebrow">LOCAL CONNECTIONS. SHARED ROOTS.</span>
-  <h1 id="hero-heading">Discover your<br class="desktop-break" /> Bangla community</h1>
-  <p>Find local businesses, events, jobs, services, and people near you.</p>
-  <form class="search-bar" role="search" (submit)="search($event)">
-    <div class="search-field">
-      <label for="community-search">What are you looking for?</label>
-      <input id="community-search" name="query" type="search" placeholder="Search businesses, services, events..." />
-    </div>
-    <div class="location-field">
-      <label for="community-location">Your Location</label>
-      <input id="community-location" name="location" type="text" placeholder="Your Location" autocomplete="address-level2" />
-    </div>
-    <button type="submit">Search</button>
-  </form>
-  @if (searchMessage()) { <p class="search-message" role="status">{{ searchMessage() }}</p> }
+  <div class="hero-copy">
+    <span class="eyebrow">ROOTED IN CULTURE. CONNECTED BY COMMUNITY.</span>
+    <h1 id="hero-heading">Discover your <span>Bangla community</span></h1>
+    <p>Find local businesses, events, jobs, services, and people near you. A little piece of home, wherever you are.</p>
+    <form class="search-bar" role="search" (submit)="search($event)">
+      <div class="search-field"><label for="community-search">What are you looking for?</label><input id="community-search" name="query" type="search" placeholder="Search businesses, services, events..." /></div>
+      <div class="location-field"><label for="community-location">Where?</label><input id="community-location" name="location" type="text" placeholder="Your Location" autocomplete="address-level2" /></div>
+      <button class="primary" type="submit">Search <span aria-hidden="true">↗</span></button>
+    </form>
+    @if (searchMessage()) { <p class="notice" role="status">{{ searchMessage() }}</p> }
+    <p class="hero-note"><span aria-hidden="true">✦</span> Local discoveries. Meaningful connections.</p>
+  </div>
+  <div class="hero-visual">
+    <img src="images/community.svg" width="800" height="620" fetchpriority="high" alt="Original illustration of neighbors connecting outside local shops on a tree-lined street" />
+    <div class="visual-caption"><span class="caption-mark" aria-hidden="true">⌂</span><div><strong>A familiar feeling. A new discovery.</strong><span>Your community starts here.</span></div></div>
+  </div>
 </section>
-<section class="categories" aria-labelledby="categories-heading">
-  <div class="section-heading"><h2 id="categories-heading">Explore your community</h2><p>A little closer to everything you need.</p></div>
+<section class="content-section" aria-labelledby="categories-heading">
+  <div class="section-heading"><div><span class="eyebrow">EXPLORE LOCAL</span><h2 id="categories-heading">Find your everyday favorites</h2></div><p>Good food. Great people. So much closer.</p></div>
   <ul class="category-grid">
-    @for (category of categories; track category; let index = $index) {
+    @for (category of categories; track category.title) {
       <li class="category-card">
-        <span class="category-mark" aria-hidden="true">{{ ['R', 'G', 'S', 'E', 'J', 'R'][index] }}</span>
-        <h3>{{ category }}</h3>
-        <span class="coming-soon">Coming soon</span>
+        <img [src]="'images/' + category.image + '.svg'" alt="" width="480" height="280" loading="lazy" decoding="async" />
+        <div class="category-copy"><span class="category-icon" aria-hidden="true">{{ category.icon }}</span><h3>{{ category.title }}</h3><p>{{ category.description }}</p></div>
       </li>
     }
   </ul>
+</section>
+<section class="featured-section" aria-labelledby="featured-heading">
+  <div class="content-section">
+    <div class="section-heading"><div><span class="eyebrow">A LITTLE LOCAL INSPIRATION</span><h2 id="featured-heading">Featured near you</h2></div><p>Sample listings · a preview of what's to come</p></div>
+    <div class="featured-grid">
+      @for (item of featured; track item.title) {
+        <article class="featured-card">
+          <div class="listing-image"><img [src]="'images/' + item.image + '.svg'" alt="" width="480" height="280" loading="lazy" decoding="async" /><span class="sample-badge">Preview</span></div>
+          <div class="listing-copy"><span class="listing-category">{{ item.category }}</span><h3>{{ item.title }}</h3><p class="city">{{ item.city }}</p><p>{{ item.description }}</p></div>
+        </article>
+      }
+    </div>
+  </div>
+</section>
+<section class="community-banner" aria-labelledby="community-heading">
+  <div class="community-symbol" aria-hidden="true"><span>ব</span><span>হ</span><span>⌂</span></div>
+  <div><span class="eyebrow">MANY NEIGHBORHOODS. ONE COMMUNITY.</span><h2 id="community-heading">Everything you need,<br /> closer to home.</h2><p>From your first day in a new city to the traditions you pass on, Bangla Hub connects the Bangladeshi community across the United States. Find your people, support local dreams, and build a sense of belonging.</p><a routerLink="/community">Meet your community <span aria-hidden="true">↗</span></a></div>
+</section>
+<section class="business-cta" aria-labelledby="business-heading">
+  <div><span class="eyebrow">GROW WITH YOUR COMMUNITY</span><h2 id="business-heading">Own a business?</h2><p>Reach your local Bangla community on Bangla Hub.</p></div>
+  <div class="cta-action"><button class="primary" type="button" (click)="businessMessage.set('Business listings are coming soon. We look forward to welcoming your business to Bangla Hub.')">List Your Business <span aria-hidden="true">↗</span></button>@if (businessMessage()) { <p class="notice" role="status">{{ businessMessage() }}</p> }</div>
 </section>

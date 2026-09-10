@@ -42,3 +42,9 @@ input:disabled { opacity: 1; color: theme.$text-secondary; cursor: not-allowed; 
 @media (max-width: 380px) {
   .account-actions { flex-basis: 100%; justify-content: flex-end; }
 }
+.header-row { max-width: 1600px; margin: auto; }
+.menu-button { border-radius: 10px; }
+.menu-button:hover { background: theme.$surface-muted; }
+.account-link:hover { color: theme.$primary-red; }
+nav a.active { text-decoration: underline; text-underline-offset: 7px; }
+@media (prefers-reduced-motion: no-preference) { a, button { transition: color .2s, background .2s; } }

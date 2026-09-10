@@ -5,3 +5,8 @@ p { margin: 0; }
 nav { display: flex; flex-wrap: wrap; gap: 24px; }
 a { color: theme.$text-secondary; text-decoration: none; }
 a:hover { color: theme.$primary-red; text-decoration: underline; }
+footer { padding-top: 40px; padding-bottom: 40px; gap: 32px; }
+.brand { color: theme.$primary-red; font-size: 20px; font-weight: 900; letter-spacing: -.6px; }
+.footer-brand p { margin: 12px 0 20px; }
+small { font-size: 12px; }
+nav a { padding: 10px 0; }

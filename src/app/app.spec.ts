@@ -53,6 +53,12 @@ describe('Routed pages', () => {
     expect(element.querySelector('input[type="password"]')).toBeNull();
     expect(element.querySelector('input[type="email"]')).toBeNull();
     expect(element.querySelectorAll('.category-card')).toHaveLength(6);
+    expect(element.querySelectorAll('.featured-card')).toHaveLength(4);
+    expect(element.textContent).toContain('Sample listings');
+    expect(element.querySelectorAll('img[loading="lazy"]')).toHaveLength(10);
+    element.querySelector<HTMLButtonElement>('.business-cta button')!.click();
+    fixture.detectChanges();
+    expect(element.querySelector('.business-cta [role="status"]')?.textContent).toContain('Business listings are coming soon');
     element.querySelector('form')!.dispatchEvent(new Event('submit', { cancelable: true }));
     fixture.detectChanges();
     expect(element.querySelector('[role="status"]')?.textContent).toContain('coming soon');
