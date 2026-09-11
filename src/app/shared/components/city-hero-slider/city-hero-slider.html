@@ -1,0 +1,29 @@
+<section class="city-hero" aria-label="Explore BanglaHub cities">
+  <div class="city-images">
+    @for (city of cities; track city.key) {
+      <div class="city-slide" role="tabpanel" [id]="'city-panel-' + city.key"
+        [attr.aria-labelledby]="'city-tab-' + city.key"
+        [attr.aria-hidden]="context.selectedCity().key !== city.key"
+        [class.active]="context.selectedCity().key === city.key">
+        @if (!unavailable().has(city.key)) {
+          <img [src]="failed().has(city.key) ? fallback : city.image"
+            [alt]="failed().has(city.key) ? 'BanglaHub community city backdrop' : city.name + ', ' + city.state + ' city view'"
+            width="800" height="620" [loading]="context.selectedCity().key === city.key ? 'eager' : 'lazy'"
+            (error)="imageError(city.key)" />
+        }
+        <div class="city-caption"><span>YOUR COMMUNITY. YOUR CITY.</span><h2>{{ city.name }}<small>{{ city.state }}</small></h2></div>
+      </div>
+    }
+  </div>
+  <div class="city-tabs" role="tablist" aria-label="Choose your city">
+    @for (city of cities; track city.key; let index = $index) {
+      <button #cityButton type="button" role="tab" [id]="'city-tab-' + city.key"
+        [attr.aria-controls]="'city-panel-' + city.key" [attr.aria-label]="'Explore ' + city.name + ', ' + city.state"
+        [attr.aria-selected]="context.selectedCity().key === city.key"
+        [tabIndex]="context.selectedCity().key === city.key ? 0 : -1"
+        (click)="context.selectCity(city.key)" (keydown)="onKey($event, index)">
+        {{ city.name }}
+      </button>
+    }
+  </div>
+</section>

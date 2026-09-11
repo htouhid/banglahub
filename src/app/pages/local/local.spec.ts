@@ -1,3 +1,5 @@
+import { CityContextService } from '../../core/services/city-context.service';
+import { WeatherService } from '../../core/services/weather.service';
 import { TestBed } from '@angular/core/testing';
 import { signal } from '@angular/core';
 import { RouterTestingHarness } from '@angular/router/testing';
@@ -14,14 +16,16 @@ import type { LocalListing } from '../../core/models/local-listing';
 const listing: LocalListing = { id: 'listing-1', category: 'restaurant', title: 'Deshi Kitchen', image_url: null, address: '1 Main St', city: 'Austin', state: 'TX', brief_review: 'Fresh favorites', is_active: true };
 describe('Local marketplace', () => {
   const api = { getListingsByCategory: vi.fn(), getApprovedReviews: vi.fn(), submitReview: vi.fn() };
-  const auth = { user: signal<{ id: string } | null>({ id: 'user-1' }) };
+  const auth = { profile: signal<{city: string; state: string} | null>(null), user: signal<{ id: string } | null>({ id: 'user-1' }) };
   beforeEach(() => {
     vi.resetAllMocks();
+    sessionStorage.clear();
+    auth.profile.set(null);
     auth.user.set({ id: 'user-1' });
     api.getListingsByCategory.mockResolvedValue([listing]);
     api.getApprovedReviews.mockResolvedValue([]);
     api.submitReview.mockResolvedValue(undefined);
-    TestBed.configureTestingModule({ providers: [provideRouter(routes), { provide: SupabaseService, useValue: api }, { provide: AuthStateService, useValue: auth }] });
+    TestBed.configureTestingModule({ providers: [{ provide: WeatherService, useValue: { getWeather: vi.fn().mockResolvedValue(null) } }, provideRouter(routes), { provide: SupabaseService, useValue: api }, { provide: AuthStateService, useValue: auth }] });
   });
   async function card() {
     const fixture = TestBed.createComponent(ListingCard);
@@ -37,7 +41,7 @@ describe('Local marketplace', () => {
       fixture.detectChanges();
       await fixture.whenStable();
       fixture.detectChanges();
-      expect(api.getListingsByCategory).toHaveBeenCalledWith(category);
+      expect(api.getListingsByCategory).toHaveBeenCalledWith(...(category === 'restaurant' ? [category, 'Austin', 'TX'] : [category]));
       expect((fixture.nativeElement as HTMLElement).textContent).toContain('Deshi Kitchen');
     }
   });
@@ -51,11 +55,11 @@ describe('Local marketplace', () => {
     expect(harness.routeNativeElement?.textContent).toContain('Discover your');
     expect(harness.routeNativeElement?.querySelector('mat-drawer')).toBeNull();
     expect(api.getListingsByCategory).toHaveBeenCalledExactlyOnceWith('grocery');
-    const tabs = harness.routeNativeElement!.querySelectorAll<HTMLElement>('[role="tab"]');
+    const tabs = harness.routeNativeElement!.querySelectorAll<HTMLElement>('.explore-tabs [role="tab"]');
     tabs[0].querySelector<HTMLElement>('.category-card')!.click();
     await harness.fixture.whenStable();
     harness.detectChanges();
-    expect(api.getListingsByCategory).toHaveBeenCalledWith('restaurant');
+    expect(api.getListingsByCategory).toHaveBeenCalledWith('restaurant', 'Austin', 'TX');
     expect(harness.routeNativeElement?.querySelectorAll('.mat-mdc-tab-body-active')).toHaveLength(1);
     tabs[1].querySelector<HTMLElement>('.category-card')!.click();
     await harness.fixture.whenStable();
@@ -68,6 +72,42 @@ describe('Local marketplace', () => {
     expect(tabs[0].getAttribute('aria-selected')).toBe('true');
   });
 
+  it('initializes Houston from profile and reloads through hero city buttons', async () => {
+    auth.profile.set({city: 'Houston', state: 'TX'});
+    const houston = {...listing, id: 'houston', title: 'Houston Kitchen', city: 'Houston'};
+    api.getListingsByCategory.mockImplementation(async (_category, city) => city === 'Houston' ? [houston, listing] : [listing]);
+    const harness = await RouterTestingHarness.create('/local/restaurants');
+    await harness.fixture.whenStable();
+    harness.detectChanges();
+    expect(api.getListingsByCategory).toHaveBeenLastCalledWith('restaurant', 'Houston', 'TX');
+    expect(harness.routeNativeElement?.textContent).toContain('Houston Kitchen');
+    expect(harness.routeNativeElement?.textContent).not.toContain('Deshi Kitchen');
+    for (const [key, city] of [['austin', 'Austin'], ['houston', 'Houston']]) {
+      harness.routeNativeElement!.querySelector<HTMLButtonElement>('#city-tab-' + key)!.click();
+      await harness.fixture.whenStable();
+      harness.detectChanges();
+      expect(api.getListingsByCategory).toHaveBeenLastCalledWith('restaurant', city, 'TX');
+      expect(harness.routeNativeElement?.textContent).toContain('Restaurants in ' + city);
+    }
+  });
+
+  it('ignores an old response when the selected city changes during loading', async () => {
+    let finish!: (rows: LocalListing[]) => void;
+    api.getListingsByCategory.mockReturnValueOnce(new Promise<LocalListing[]>(resolve => finish = resolve))
+      .mockResolvedValue([]);
+    const fixture = TestBed.createComponent(Restaurants);
+    fixture.detectChanges();
+    await vi.waitFor(() => expect(api.getListingsByCategory).toHaveBeenCalledWith('restaurant', 'Austin', 'TX'));
+    TestBed.inject(CityContextService).selectCity('houston');
+    fixture.detectChanges();
+    await vi.waitFor(() => expect(api.getListingsByCategory).toHaveBeenLastCalledWith('restaurant', 'Houston', 'TX'));
+    finish([listing]);
+    await fixture.whenStable();
+    fixture.detectChanges();
+    expect(fixture.nativeElement.textContent).toContain('No restaurant listings available in Houston yet.');
+    expect(fixture.nativeElement.textContent).not.toContain('Deshi Kitchen');
+  });
+
   it('shows the no-results state when no listings are available', async () => {
     api.getListingsByCategory.mockResolvedValue([]);
     const fixture = TestBed.createComponent(Restaurants);
@@ -76,7 +116,7 @@ describe('Local marketplace', () => {
     fixture.detectChanges();
     const element = fixture.nativeElement as HTMLElement;
     expect(element.querySelector('app-listing-card')).toBeNull();
-    expect(element.textContent).toContain('No local matches yet');
+    expect(element.textContent).toContain('No restaurant listings available in Austin yet.');
     expect(element.querySelector<HTMLButtonElement>('.state-card button')).toBeTruthy();
   });
 

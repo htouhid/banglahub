@@ -2,8 +2,8 @@ import { TestBed } from '@angular/core/testing';
 import { vi } from 'vitest';
 import { SupabaseService } from './supabase.service';
 
-const { signUp, schema, from, select, eq, maybeSingle, order, returns, insert } = vi.hoisted(() => ({
-  signUp: vi.fn(), schema: vi.fn(), from: vi.fn(), select: vi.fn(), eq: vi.fn(), maybeSingle: vi.fn(), order: vi.fn(), returns: vi.fn(), insert: vi.fn(),
+const { signUp, schema, from, select, eq, ilike, maybeSingle, order, returns, insert } = vi.hoisted(() => ({
+  signUp: vi.fn(), schema: vi.fn(), from: vi.fn(), select: vi.fn(), eq: vi.fn(), ilike: vi.fn(), maybeSingle: vi.fn(), order: vi.fn(), returns: vi.fn(), insert: vi.fn(),
 }));
 vi.mock('@supabase/supabase-js', () => ({
   createClient: () => ({ auth: { signUp }, schema }),
@@ -29,12 +29,15 @@ describe('SupabaseService signup', () => {
     schema.mockReturnValue({ from });
     from.mockReturnValue({ select, insert });
     select.mockReturnValue({ eq });
-    eq.mockReturnValue({ eq, order });
+    eq.mockReturnValue({ eq, order, ilike });
+    ilike.mockReturnValue({ ilike, order });
     order.mockReturnValue({ returns });
     returns.mockResolvedValue({ data: [], error: null });
     insert.mockResolvedValue({ error: null });
     const service = TestBed.inject(SupabaseService);
-    await service.getListingsByCategory('restaurant');
+    await service.getListingsByCategory('restaurant', 'Houston', 'TX');
+    expect(ilike).toHaveBeenCalledWith('city', 'Houston');
+    expect(ilike).toHaveBeenCalledWith('state', 'TX');
     expect(from).toHaveBeenCalledWith('local_listings');
     expect(eq).toHaveBeenCalledWith('category', 'restaurant');
     expect(eq).toHaveBeenCalledWith('is_active', true);

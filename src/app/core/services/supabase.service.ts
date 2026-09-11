@@ -34,10 +34,14 @@ export class SupabaseService {
     return data;
   }
 
-  async getListingsByCategory(category: ListingCategory): Promise<LocalListing[]> {
-    const { data, error } = await this.client.schema('public').from('local_listings')
-      .select('*').eq('category', category).eq('is_active', true).order('title')
-      .returns<LocalListing[]>();
+  async getListingsByCategory(category: ListingCategory, city?: string, state?: string): Promise<LocalListing[]> {
+    let query = this.client.schema('public').from('local_listings')
+      .select('*').eq('category', category).eq('is_active', true);
+    if (city && state) {
+      const literal = (value: string) => value.trim().replace(/[\\%_]/g, character => '\\' + character);
+      query = query.ilike('city', literal(city)).ilike('state', literal(state));
+    }
+    const { data, error } = await query.order('title').returns<LocalListing[]>();
     if (error) throw error;
     return data ?? [];
   }

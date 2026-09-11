@@ -1,8 +1,9 @@
 import { LocalListingSlider } from '../../../shared/components/local-listing-slider/local-listing-slider';
-import { afterNextRender, Component, computed, inject, Injector, input, PendingTasks, signal } from '@angular/core';
+import { afterNextRender, Component, computed, DestroyRef, effect, untracked, inject, Injector, input, PendingTasks, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { SupabaseService } from '../../../core/services/supabase.service';
 import type { ListingCategory, LocalListing } from '../../../core/models/local-listing';
+import type { CityOption } from '../../../shared/model/city-option.model';
 import { ListingCard } from '../listing-card/listing-card';
 
 @Component({
@@ -12,6 +13,10 @@ import { ListingCard } from '../listing-card/listing-card';
   styleUrl: './marketplace.scss',
 })
 export class Marketplace {
+  readonly city = input<CityOption>();
+  private readonly ready = signal(false);
+  private readonly destroyRef = inject(DestroyRef);
+  private requestId = 0;
   readonly category = input.required<ListingCategory>();
   readonly heading = input.required<string>();
   readonly description = input.required<string>();
@@ -28,16 +33,34 @@ export class Marketplace {
       && `${item.address} ${item.city}, ${item.state}`.toLowerCase().includes(location));
   });
   constructor() {
-    afterNextRender(() => this.pending.run(() => this.load()));
+    afterNextRender(() => this.ready.set(true));
+    effect(() => {
+      this.category(); this.city();
+      if (this.ready()) untracked(() => {
+        this.form.reset();
+        this.filters.set({ query: '', location: '' });
+        void this.pending.run(() => this.load());
+      });
+    });
   }
   protected async load(): Promise<void> {
+    const id = ++this.requestId;
+    const city = this.city();
+    this.listings.set([]);
     this.loading.set(true);
     this.error.set('');
     try {
-      this.listings.set(await this.injector.get(SupabaseService).getListingsByCategory(this.category()));
+      const api = this.injector.get(SupabaseService);
+      const rows = city ? await api.getListingsByCategory(this.category(), city.name, city.state)
+        : await api.getListingsByCategory(this.category());
+      if (id === this.requestId && !this.destroyRef.destroyed) {
+        this.listings.set(city ? rows.filter(row =>
+          row.city.trim().toLowerCase() === city.name.toLowerCase() &&
+          row.state.trim().toUpperCase() === city.state.toUpperCase()) : rows);
+      }
     } catch {
-      this.error.set('Unable to load listings. Please try again.');
-    } finally { this.loading.set(false); }
+      if (id === this.requestId && !this.destroyRef.destroyed) this.error.set('Unable to load listings. Please try again.');
+    } finally { if (id === this.requestId && !this.destroyRef.destroyed) this.loading.set(false); }
   }
   protected search(): void {
     const value = this.form.getRawValue();

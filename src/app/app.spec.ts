@@ -1,3 +1,4 @@
+import { WeatherService } from './core/services/weather.service';
 import { signal } from '@angular/core';
 import { NewsService } from './core/services/news.service';
 import { Type } from '@angular/core';
@@ -31,7 +32,7 @@ describe('Routed pages', () => {
     auth.getSession.mockResolvedValue({ data: { session: null }, error: null });
     await TestBed.configureTestingModule({
       imports: [Home, Header, SignIn, SignUp, Account],
-      providers: [{ provide: NewsService, useValue: { items: signal([]), loading: signal(false), error: signal(''), stale: signal(false) } }, provideRouter(routes), { provide: SupabaseService, useValue: auth }],
+      providers: [{ provide: WeatherService, useValue: { getWeather: vi.fn().mockResolvedValue({ temperature: 78, condition: 'Sunny', high: 85, low: 62, icon: '☀' }) } }, { provide: NewsService, useValue: { items: signal([]), loading: signal(false), error: signal(''), stale: signal(false) } }, provideRouter(routes), { provide: SupabaseService, useValue: auth }],
     }).compileComponents();
   });
 
@@ -60,7 +61,7 @@ describe('Routed pages', () => {
     expect(element.querySelectorAll('.category-card')).toHaveLength(6);
     expect(element.querySelectorAll('.featured-card')).toHaveLength(4);
     expect(element.textContent).toContain('Sample listings');
-    expect(element.querySelectorAll('img[loading="lazy"]')).toHaveLength(10);
+    expect(element.querySelectorAll('.category-card img[loading="lazy"], .featured-card img[loading="lazy"]')).toHaveLength(10);
     element.querySelector<HTMLButtonElement>('.business-cta button')!.click();
     fixture.detectChanges();
     expect(element.querySelector('.business-cta [role="status"]')?.textContent).toContain('Business listings are coming soon');
