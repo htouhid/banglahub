@@ -24,3 +24,21 @@ it('returns a graceful uncached failure if the publisher is unavailable', async 
   expect(JSON.parse(res.end.mock.calls[0][0]).items).toEqual([]);
 });
 afterEach(() => vi.unstubAllGlobals());
+it('serves stale cache when both sources fail after freshness expires', async () => {
+  vi.resetModules();
+  const clock = vi.spyOn(Date, 'now').mockReturnValue(1000000);
+  vi.spyOn(console, 'error').mockImplementation(() => {});
+  const fetcher = vi.fn().mockResolvedValue(new Response('<rss><channel><title>News</title></channel></rss>'));
+  vi.stubGlobal('fetch', fetcher);
+  const { newsHandler } = await import('./news-api');
+  const response = () => ({ setHeader: vi.fn(), end: vi.fn(), statusCode: 200 });
+  await newsHandler({ method: 'GET' }, response());
+  clock.mockReturnValue(1000000 + 16 * 60 * 1000);
+  fetcher.mockRejectedValue(new Error('Blocked'));
+  const stale = response();
+  await newsHandler({ method: 'GET' }, stale);
+  expect(stale.statusCode).toBe(200);
+  expect(JSON.parse(stale.end.mock.calls[0][0]).stale).toBe(true);
+  expect(fetcher).toHaveBeenCalledTimes(3);
+  vi.restoreAllMocks();
+});

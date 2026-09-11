@@ -1,17 +1,11 @@
+import { fetchNewsItems } from './fetch-news';
 interface NewsRequest { method?: string; }
 interface NewsServerResponse { statusCode: number; setHeader(name: string, value: string): unknown; end(body: string): unknown; }
 import type { NewsItem, NewsResponse } from '../../app/core/models/news';
-import { DHAKA_TRIBUNE_FEED, normalizeDhakaTribune } from './dhaka-tribune';
 const TTL = 15 * 60 * 1000;
 let cache: { items: NewsItem[]; fetchedAt: number } | undefined;
 let pending: Promise<NewsItem[]> | undefined;
-async function fetchNews(): Promise<NewsItem[]> {
-  const response = await fetch(DHAKA_TRIBUNE_FEED, { signal: AbortSignal.timeout(10000), headers: { Accept: 'application/rss+xml, application/xml' } });
-  if (!response.ok) throw new Error('Publisher unavailable');
-  const xml = await response.text();
-  if (xml.length > 2_000_000) throw new Error('Feed too large');
-  return normalizeDhakaTribune(xml);
-}
+
 export async function newsHandler(req: NewsRequest, res: NewsServerResponse): Promise<void> {
   res.setHeader('Content-Type', 'application/json; charset=utf-8');
   res.setHeader('X-Content-Type-Options', 'nosniff');
@@ -19,7 +13,7 @@ export async function newsHandler(req: NewsRequest, res: NewsServerResponse): Pr
   let payload: NewsResponse;
   try {
     if (!cache || Date.now() - cache.fetchedAt > TTL) {
-      pending ??= fetchNews().then(items => { cache = { items, fetchedAt: Date.now() }; return items; }).finally(() => { pending = undefined; });
+      pending ??= fetchNewsItems().then(items => { cache = { items, fetchedAt: Date.now() }; return items; }).finally(() => { pending = undefined; });
       await pending;
     }
     payload = { items: cache!.items };

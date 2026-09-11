@@ -6,7 +6,7 @@
     <span class="preview">{{ item.source }}</span>
     <article [class.no-image]="!item.imageUrl || failedImage() === item.url">
       @if (item.imageUrl && failedImage() !== item.url) { <img [src]="item.imageUrl" [alt]="item.title" width="480" height="280" loading="lazy" decoding="async" (error)="failedImage.set(item.url)" /> }
-      <div><h3><a [href]="item.url" target="_blank" rel="noopener noreferrer">{{ item.title }}</a></h3>@if (item.summary) { <p class="summary">{{ item.summary }}</p> }<time [attr.datetime]="item.publishedAt">{{ item.publishedAt | date:'mediumDate':'UTC' }}</time></div>
+      <div><h3><a [href]="item.url" target="_blank" rel="noopener noreferrer">{{ item.title }}</a></h3>@if (item.summary) { <p class="summary">{{ item.summary }}</p> }@if (item.publishedAt) { <time [attr.datetime]="item.publishedAt">{{ item.publishedAt | date:'mediumDate':'UTC' }}</time> }</div>
     </article>
     @if (news.stale()) { <p>Showing recently cached headlines.</p> }
   } @else { <p>No headlines available yet.</p> }

@@ -8,7 +8,7 @@
       @for (item of news.items(); track item.url) {
         <article>
           @if (item.imageUrl && !failedImages().has(item.url)) { <img [src]="item.imageUrl" [alt]="item.title" width="600" height="360" loading="lazy" decoding="async" (error)="imageError(item.url)" /> }
-          <div class="copy"><span class="eyebrow">{{ item.source }}</span>@if (item.category) { <span class="category"> · {{ item.category }}</span> }<h2>{{ item.title }}</h2><time [attr.datetime]="item.publishedAt">{{ item.publishedAt | date:'medium':'UTC' }} UTC</time>@if (item.summary) { <p>{{ item.summary }}</p> }<a [href]="item.url" target="_blank" rel="noopener noreferrer">Read full story <span aria-hidden="true">↗</span><span class="sr-only">: {{ item.title }} (opens in a new tab)</span></a></div>
+          <div class="copy"><span class="eyebrow">{{ item.source }}</span>@if (item.category) { <span class="category"> · {{ item.category }}</span> }<h2>{{ item.title }}</h2>@if (item.publishedAt) { <time [attr.datetime]="item.publishedAt">{{ item.publishedAt | date:'medium':'UTC' }} UTC</time> }@if (item.summary) { <p>{{ item.summary }}</p> }<a [href]="item.url" target="_blank" rel="noopener noreferrer">Read full story <span aria-hidden="true">↗</span><span class="sr-only">: {{ item.title }} (opens in a new tab)</span></a></div>
         </article>
       } @empty { <p>No headlines available yet. Please check back soon.</p> }
     </div>
