@@ -1,4 +1,4 @@
-import { fetchNewsItems } from './fetch-news';
+import { fetchNewsItems, NewsConfigurationError } from './fetch-news';
 interface NewsRequest { method?: string; }
 interface NewsServerResponse { statusCode: number; setHeader(name: string, value: string): unknown; end(body: string): unknown; }
 import type { NewsItem, NewsResponse } from '../../app/core/models/news';
@@ -18,9 +18,9 @@ export async function newsHandler(req: NewsRequest, res: NewsServerResponse): Pr
     }
     payload = { items: cache!.items };
     res.setHeader('Cache-Control', 'public, max-age=0, s-maxage=900, stale-while-revalidate=60');
-  } catch {
-    if (cache && Date.now() - cache.fetchedAt < 24 * 60 * 60 * 1000) payload = { items: cache.items, stale: true };
-    else { res.statusCode = 503; payload = { items: [], error: 'News is temporarily unavailable. Please try again shortly.' }; }
+  } catch (error) {
+    if (!(error instanceof NewsConfigurationError) && cache && Date.now() - cache.fetchedAt < 24 * 60 * 60 * 1000) payload = { items: cache.items, stale: true };
+    else { res.statusCode = error instanceof NewsConfigurationError ? 500 : 503; payload = { items: [], error: 'News is temporarily unavailable.' }; }
     res.setHeader('Cache-Control', 'no-store');
   }
   res.end(JSON.stringify(payload));

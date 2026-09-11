@@ -1,4 +1,4 @@
-import { fetchNewsItems } from '../src/server/news/fetch-news';
+import { fetchNewsItems, NewsConfigurationError } from '../src/server/news/fetch-news';
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import type { NewsItem } from '../src/app/core/models/news';
 
@@ -25,12 +25,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse): 
     }
     res.setHeader('Cache-Control', 'public, max-age=0, s-maxage=900, stale-while-revalidate=60');
     res.status(200).json({ items: cache!.items });
-  } catch {
+  } catch (error) {
     res.setHeader('Cache-Control', 'no-store');
-    if (cache && Date.now() - cache.fetchedAt < 24 * 60 * 60 * 1000) {
+    if (!(error instanceof NewsConfigurationError) && cache && Date.now() - cache.fetchedAt < 24 * 60 * 60 * 1000) {
       res.status(200).json({ items: cache.items, stale: true });
     } else {
-      res.status(503).json({ items: [], error: 'News is temporarily unavailable. Please try again shortly.' });
+      res.status(error instanceof NewsConfigurationError ? 500 : 503).json({ items: [], error: 'News is temporarily unavailable.' });
     }
   }
 }
