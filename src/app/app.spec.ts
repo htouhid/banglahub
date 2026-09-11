@@ -8,12 +8,14 @@ import { TestBed } from '@angular/core/testing';
 import { vi } from 'vitest';
 import { Home } from './pages/home/home';
 import { SupabaseService } from './core/services/supabase.service';
-import { provideRouter } from '@angular/router';
+import { Router, provideRouter } from '@angular/router';
 import { Header } from './shared/components/header/header';
 
 describe('Routed pages', () => {
   const auth = {
-    client: { auth: { onAuthStateChange: vi.fn(() => ({ data: { subscription: { unsubscribe: vi.fn() } } })) } },
+    onAuthStateChange: vi.fn(() => ({ data: { subscription: { unsubscribe: vi.fn() } } })),
+    getProfile: vi.fn(),
+    getListingsByCategory: vi.fn().mockResolvedValue([]),
     getSession: vi.fn(),
     getUser: vi.fn(),
     signUp: vi.fn(),
@@ -23,6 +25,7 @@ describe('Routed pages', () => {
 
   beforeEach(async () => {
     vi.clearAllMocks();
+    auth.getProfile.mockResolvedValue(null);
     auth.getSession.mockResolvedValue({ data: { session: null }, error: null });
     await TestBed.configureTestingModule({
       imports: [Home, Header, SignIn, SignUp, Account],
@@ -127,12 +130,74 @@ describe('Routed pages', () => {
     const fixture = await render(SignUp);
     const element = fixture.nativeElement as HTMLElement;
     fillForm(element, 'member@example.com', 'password123');
+    for (const [id, value] of Object.entries({ first_name: '  Amina  ', last_name: '  Rahman ', city: ' Queens ', state: 'NY', sex: 'prefer_not_to_say', age_group: '25-34' })) {
+      const field = element.querySelector<HTMLInputElement | HTMLSelectElement>(`#${id}`)!;
+      field.value = value;
+      field.dispatchEvent(new Event(field.tagName === 'SELECT' ? 'change' : 'input'));
+    }
+    expect(element.querySelectorAll('#state option')).toHaveLength(52);
     element.querySelector('form')!.dispatchEvent(new Event('submit', { cancelable: true }));
     await fixture.whenStable();
     fixture.detectChanges();
-    expect(auth.signUp).toHaveBeenCalledWith('member@example.com', 'password123');
+    expect(auth.signUp).toHaveBeenCalledWith('member@example.com', 'password123', { first_name: 'Amina', last_name: 'Rahman', city: 'Queens', state: 'NY', sex: 'prefer_not_to_say', age_group: '25-34' });
     expect(element.textContent).toContain('Check your email for a confirmation link');
     expect(element.querySelector('form')).toBeTruthy();
+  });
+
+  it.each([true, false])('signup navigation follows the Supabase result: success=%s', async (succeeded) => {
+    auth.signUp.mockResolvedValue({
+      data: { session: null, user: null },
+      error: succeeded ? null : new Error('Signup is unavailable'),
+    });
+    const harness = await RouterTestingHarness.create();
+    await harness.navigateByUrl('/sign-up', SignUp);
+    await harness.fixture.whenStable();
+    harness.detectChanges();
+    const element = harness.routeNativeElement!;
+    fillForm(element, 'member@example.com', 'password123');
+    for (const [id, value] of Object.entries({ first_name: 'Hussain', last_name: 'Rahman', city: 'Austin', state: 'TX', sex: 'male', age_group: '25-34' })) {
+      const field = element.querySelector<HTMLInputElement | HTMLSelectElement>(`#${id}`)!;
+      field.value = value;
+      field.dispatchEvent(new Event(field.tagName === 'SELECT' ? 'change' : 'input'));
+    }
+    element.querySelector('form')!.dispatchEvent(new Event('submit', { cancelable: true }));
+    await harness.fixture.whenStable();
+    harness.detectChanges();
+    expect(TestBed.inject(Router).url).toBe(succeeded ? '/sign-up-success' : '/sign-up');
+    if (succeeded) {
+      expect(harness.routeNativeElement?.textContent).toContain('Thank you for signing up!');
+      expect(harness.routeNativeElement?.querySelector('a[href="/sign-in"]')?.textContent).toContain('Go to Sign In');
+      expect(harness.routeNativeElement?.textContent).not.toContain('password123');
+    } else {
+      expect(harness.routeNativeElement?.querySelector('[role="alert"]')?.textContent).toContain('Signup is unavailable');
+    }
+  });
+
+  it.each(['/local/restaurants', '/local/groceries', 'https://example.com'])('handles login return URLs safely: %s', async (returnUrl) => {
+    auth.signIn.mockResolvedValue({ data: { session: { user: { id: 'user-1', email: 'member@example.com' } } }, error: null });
+    const harness = await RouterTestingHarness.create();
+    await harness.navigateByUrl('/sign-in?returnUrl=' + encodeURIComponent(returnUrl));
+    await harness.fixture.whenStable();
+    harness.detectChanges();
+    const element = harness.routeNativeElement!;
+    fillForm(element, 'member@example.com', 'password123');
+    element.querySelector('form')!.dispatchEvent(new Event('submit', { cancelable: true }));
+    await harness.fixture.whenStable();
+    expect(TestBed.inject(Router).url.split('?')[0]).toBe(returnUrl.startsWith('/local/') ? '/' : '/sign-in');
+  });
+
+  it('requires profile fields only on sign-up and rejects whitespace-only names', async () => {
+    const fixture = await render(SignUp);
+    const element = fixture.nativeElement as HTMLElement;
+    fillForm(element, 'member@example.com', 'password123');
+    const name = element.querySelector<HTMLInputElement>('#first_name')!;
+    name.value = '   ';
+    name.dispatchEvent(new Event('input'));
+    element.querySelector('form')!.dispatchEvent(new Event('submit', { cancelable: true }));
+    fixture.detectChanges();
+    expect(auth.signUp).not.toHaveBeenCalled();
+    expect(element.textContent).toContain('First Name is required.');
+    expect(element.textContent).toContain('Select a state.');
   });
 
   it('disables buttons during login and displays authentication errors', async () => {

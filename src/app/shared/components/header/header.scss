@@ -48,3 +48,6 @@ input:disabled { opacity: 1; color: theme.$text-secondary; cursor: not-allowed; 
 .account-link:hover { color: theme.$primary-red; }
 nav a.active { text-decoration: underline; text-underline-offset: 7px; }
 @media (prefers-reduced-motion: no-preference) { a, button { transition: color .2s, background .2s; } }
+
+.location { max-width: 200px; }
+.location-label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }

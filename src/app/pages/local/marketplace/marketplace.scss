@@ -1,0 +1,21 @@
+@use '../../../../styles/theme' as t;
+.hero { padding: 56px 24px; text-align: center; background: t.$warm-background; border-bottom: 1px solid t.$border-color; }
+.eyebrow { color: t.$primary-red; font-size: 11px; font-weight: 800; letter-spacing: 2px; }
+h1 { font-size: clamp(36px, 6vw, 60px); letter-spacing: -2px; margin: 16px 0; }
+p { color: t.$text-secondary; line-height: 1.6; }
+form { display: flex; align-items: center; gap: 20px; max-width: 860px; margin: 32px auto 0; text-align: left; padding: 20px; background: white; border: 1px solid t.$border-color; border-radius: 18px; box-shadow: 0 8px 28px #30251908; }
+form div { flex: 1; min-width: 0; }
+label { display: block; font-size: 12px; font-weight: 700; margin-bottom: 8px; }
+input { width: 100%; min-width: 0; border: 0; padding: 8px 0; font: inherit; font-size: 16px; }
+button { background: t.$primary-red; color: white; border: 0; border-radius: 10px; padding: 14px 24px; font: inherit; font-weight: 700; cursor: pointer; }
+button:hover { background: t.$primary-red-hover; }
+.results { max-width: 1240px; padding: 32px 24px 64px; margin: auto; }
+.result-count { font-size: 14px; margin-bottom: 24px; }
+.listing-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 28px; align-items: start; }
+@media (max-width: 700px) { .listing-grid { grid-template-columns: 1fr; } form { flex-direction: column; align-items: stretch; } }
+
+.state-card { grid-column: 1 / -1; padding: 48px 24px; text-align: center; background: t.$warm-background; border: 1px solid t.$border-color; border-radius: 20px; }
+.state-card h2 { font-size: 24px; }
+.skeleton { height: 420px; border-radius: 22px; background: linear-gradient(110deg, #f3f0eb 30%, #faf8f4 45%, #f3f0eb 60%); background-size: 250% 100%; animation: shimmer 1.8s linear infinite; }
+@keyframes shimmer { to { background-position: -250% 0; } }
+@media (prefers-reduced-motion: reduce) { .skeleton { animation: none; } }

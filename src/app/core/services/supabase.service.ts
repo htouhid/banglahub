@@ -1,3 +1,4 @@
+import type { LocalListing, ListingCategory, GuestReview } from '../models/local-listing';
 import { Injectable } from '@angular/core';
 import {
   createClient,
@@ -5,21 +6,61 @@ import {
   type AuthTokenResponsePassword,
   type SupabaseClient,
   type UserResponse,
+  type AuthChangeEvent,
+  type Session,
 } from '@supabase/supabase-js';
 
+import type { SignUpProfile, UserProfile } from '../models/profile';
 import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root',
 })
 export class SupabaseService {
-  readonly client: SupabaseClient = createClient(
+  private readonly client: SupabaseClient = createClient(
     environment.supabaseUrl,
     environment.supabasePublishableKey,
   );
 
-  signUp(email: string, password: string): Promise<AuthResponse> {
-    return this.client.auth.signUp({ email, password });
+  onAuthStateChange(callback: (event: AuthChangeEvent, session: Session | null) => void) {
+    return this.client.auth.onAuthStateChange(callback);
+  }
+
+  async getProfile(userId: string): Promise<UserProfile | null> {
+    const { data, error } = await this.client.schema('public').from('profiles')
+      .select('id, first_name, last_name, city, state, sex, age_group, created_at, updated_at')
+      .eq('id', userId).maybeSingle<UserProfile>();
+    if (error) throw error;
+    return data;
+  }
+
+  async getListingsByCategory(category: ListingCategory): Promise<LocalListing[]> {
+    const { data, error } = await this.client.schema('public').from('local_listings')
+      .select('*').eq('category', category).eq('is_active', true).order('title')
+      .returns<LocalListing[]>();
+    if (error) throw error;
+    return data ?? [];
+  }
+
+  async getApprovedReviews(listingId: string): Promise<GuestReview[]> {
+    const { data, error } = await this.client.schema('public').from('local_reviews')
+      .select('id, listing_id, user_id, feedback, status, created_at')
+      .eq('listing_id', listingId).eq('status', 'approved').order('created_at', { ascending: false })
+      .returns<GuestReview[]>();
+    if (error) throw error;
+    return data ?? [];
+  }
+
+  async submitReview(listingId: string, userId: string, feedback: string): Promise<void> {
+    const trimmed = feedback.trim();
+    if (!trimmed || feedback.length > 500) throw new Error('Feedback must contain 1–500 characters.');
+    const { error } = await this.client.schema('public').from('local_reviews')
+      .insert({ listing_id: listingId, user_id: userId, feedback: trimmed, status: 'pending' });
+    if (error) throw error;
+  }
+
+  signUp(email: string, password: string, profile: SignUpProfile): Promise<AuthResponse> {
+    return this.client.auth.signUp({ email, password, options: { data: { ...profile } } });
   }
 
   signIn(email: string, password: string): Promise<AuthTokenResponsePassword> {

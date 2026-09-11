@@ -6,3 +6,8 @@ button { background: theme.$primary-red; color: theme.$background; border: 0; bo
 button:hover:not(:disabled) { background: theme.$primary-red-hover; }
 button:disabled { opacity: 0.6; cursor: wait; }
 .error { color: theme.$error-text; }
+
+.profile-details { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; margin: 28px 0; }
+dt { color: theme.$text-secondary; font-size: 13px; }
+dd { margin: 6px 0 0; overflow-wrap: anywhere; }
+@media (max-width: 480px) { .profile-details { grid-template-columns: 1fr; } }

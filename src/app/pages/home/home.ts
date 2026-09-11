@@ -1,13 +1,50 @@
-import { Component, signal } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { DOCUMENT } from '@angular/common';
+import { MatTabsModule } from '@angular/material/tabs';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { Restaurants } from '../local/restaurants/restaurants';
+import { Groceries } from '../local/groceries/groceries';
+import { afterNextRender, Component, computed, effect, inject, Injector, signal } from '@angular/core';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-home',
-  imports: [RouterLink],
+  imports: [RouterLink, MatTabsModule, Restaurants, Groceries],
   templateUrl: './home.html',
   styleUrl: './home.scss',
 })
 export class Home {
+  private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
+  private readonly injector = inject(Injector);
+  private readonly document = inject(DOCUMENT);
+  private readonly params = toSignal(this.route.queryParamMap, { initialValue: this.route.snapshot.queryParamMap });
+  private readonly keys = ['restaurants', 'groceries', 'services', 'events', 'jobs', 'rentals'];
+  protected readonly active = computed(() => this.keys.indexOf(this.params().get('category') ?? ''));
+  protected readonly visited = signal<ReadonlySet<number>>(new Set());
+  constructor() {
+    effect(() => {
+      const index = this.active();
+      if (index >= 0) this.visited.update(previous => new Set([...previous, index]));
+    });
+  }
+  protected keySelect(event: Event): void {
+    if ((event.target as HTMLElement).getAttribute('role') === 'tab') this.select(this.focused());
+  }
+  protected readonly focused = signal(0);
+  protected select(index: number): void {
+    if (index === this.active()) return;
+    void this.router.navigate([], { relativeTo: this.route, queryParams: { category: this.keys[index] }, queryParamsHandling: 'merge' });
+    afterNextRender(() => {
+      const view = this.document.defaultView;
+      const content = this.document.querySelector('.explore-tabs .mat-mdc-tab-body-active');
+      if (view && content && content.getBoundingClientRect().top > view.innerHeight - 100) {
+        content.scrollIntoView({ block: 'start', behavior: view.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth' });
+      }
+    }, { injector: this.injector });
+  }
+  protected changed(index: number): void {
+    if (this.active() >= 0) this.select(index);
+  }
   protected readonly categories = [
     { title: 'Restaurants', image: 'food', icon: '♨', description: 'A taste of home, around the corner.' },
     { title: 'Groceries', image: 'groceries', icon: '✿', description: 'Everyday essentials. Familiar flavors.' },

@@ -4,9 +4,9 @@
 fieldset { margin: 0; padding: 0; border: 0; min-width: 0; }
 .field { margin-bottom: 18px; }
 label { display: block; margin-bottom: 8px; font-size: 14px; font-weight: 600; }
-input { width: 100%; border: 1px solid theme.$border-color; border-radius: 9px; padding: 13px 14px; background: theme.$surface-muted; color: theme.$text-primary; font: inherit; font-size: 16px; }
+input, select { width: 100%; border: 1px solid theme.$border-color; border-radius: 9px; padding: 13px 14px; background: theme.$surface-muted; color: theme.$text-primary; font: inherit; font-size: 16px; }
 input::placeholder { color: theme.$text-secondary; }
-input[aria-invalid='true'] { border-color: theme.$error-text; }
+input[aria-invalid='true'], select[aria-invalid='true'] { border-color: theme.$error-text; }
 .field-error { display: block; margin-top: 6px; color: theme.$error-text; font-size: 12px; line-height: 1.5; }
 .actions { margin-top: 24px; }
 button { width: 100%; min-height: 46px; padding: 12px 16px; border: 0; border-radius: 9px; font: inherit; font-size: 14px; font-weight: 600; cursor: pointer; background: theme.$primary-red; color: theme.$background; }
@@ -18,3 +18,10 @@ button:disabled { opacity: 0.6; cursor: wait; }
 a { color: theme.$primary-red; }
 .switch-page { font-size: 14px; line-height: 1.6; margin: 24px 0 0; }
 @media (max-width: 480px) { .auth-card { padding: 24px 20px; } }
+
+select:focus-visible { outline: 3px solid theme.$focus-color; outline-offset: 3px; }
+
+.signup-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 24px; }
+.profile-fields { display: contents; }
+.signup-grid .actions { grid-column: 1 / -1; }
+@media (max-width: 600px) { .signup-grid { grid-template-columns: 1fr; } }

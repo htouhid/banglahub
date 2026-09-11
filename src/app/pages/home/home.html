@@ -18,14 +18,29 @@
 </section>
 <section class="content-section" aria-labelledby="categories-heading">
   <div class="section-heading"><div><span class="eyebrow">EXPLORE LOCAL</span><h2 id="categories-heading">Find your everyday favorites</h2></div><p>Good food. Great people. So much closer.</p></div>
-  <ul class="category-grid">
-    @for (category of categories; track category.title) {
-      <li class="category-card">
-        <img [src]="'images/' + category.image + '.png'" alt="" width="480" height="280" loading="lazy" decoding="async" />
-        <div class="category-copy"><span class="category-icon" aria-hidden="true">{{ category.icon }}</span><h3>{{ category.title }}</h3><p>{{ category.description }}</p></div>
-      </li>
+  <mat-tab-group class="explore-tabs" [class.unselected]="active() < 0" [selectedIndex]="active() < 0 ? 0 : active()" [preserveContent]="true" animationDuration="0ms"
+    (selectedIndexChange)="changed($event)" (focusChange)="focused.set($event.index)"
+    (keydown.enter)="keySelect($event)" (keydown.space)="keySelect($event)">
+    @for (category of categories; track category.title; let index = $index) {
+      <mat-tab>
+        <ng-template matTabLabel>
+          <span class="category-card" [class.chosen]="active() === index" (click)="select(index)">
+            <img [src]="'images/' + category.image + '.png'" alt="" width="480" height="280" loading="lazy" decoding="async" />
+            <span class="category-copy"><span class="category-icon" aria-hidden="true">{{ category.icon }}</span><strong>{{ category.title }}</strong><span>{{ category.description }}</span></span>
+          </span>
+        </ng-template>
+        <ng-template matTabContent>
+          @if (visited().has(index)) {
+            @switch (index) {
+              @case (0) { <app-restaurants /> }
+              @case (1) { <app-groceries /> }
+              @default { <section class="category-placeholder"><h2>{{ category.title }}</h2><p>Coming soon</p><p>More ways to connect with your local Bangla community are on the way.</p></section> }
+            }
+          }
+        </ng-template>
+      </mat-tab>
     }
-  </ul>
+  </mat-tab-group>
 </section>
 <section class="featured-section" aria-labelledby="featured-heading">
   <div class="content-section">
@@ -48,3 +63,4 @@
   <div><span class="eyebrow">GROW WITH YOUR COMMUNITY</span><h2 id="business-heading">Own a business?</h2><p>Reach your local Bangla community on Bangla Hub.</p></div>
   <div class="cta-action"><button class="primary" type="button" (click)="businessMessage.set('Business listings are coming soon. We look forward to welcoming your business to Bangla Hub.')">List Your Business <span aria-hidden="true">↗</span></button>@if (businessMessage()) { <p class="notice" role="status">{{ businessMessage() }}</p> }</div>
 </section>
+

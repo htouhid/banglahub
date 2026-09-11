@@ -1,0 +1,31 @@
+@use '../../../../styles/theme' as t;
+article { border: 1px solid t.$border-color; border-radius: 22px; overflow: hidden; background: white; box-shadow: 0 8px 28px #30251906; }
+.listing-image { width: 100%; height: auto; aspect-ratio: 8 / 5; object-fit: cover; display: block; background: t.$warm-background; }
+.card-content { padding: 28px; overflow-wrap: anywhere; }
+.eyebrow { color: t.$primary-red; font-size: 11px; font-weight: 800; letter-spacing: 1.5px; }
+h2 { font-size: 26px; letter-spacing: -.6px; margin: 12px 0; }
+address { font-style: normal; color: t.$text-secondary; font-size: 14px; line-height: 1.6; }
+p { color: t.$text-secondary; line-height: 1.6; font-size: 14px; }
+.reviews { border-top: 1px solid t.$border-color; margin-top: 24px; padding-top: 16px; }
+h3 { font-size: 16px; margin: 8px 0; }
+blockquote { margin: 16px 0; padding: 12px 16px; border-left: 3px solid t.$border-color; background: t.$surface-muted; line-height: 1.6; white-space: pre-wrap; font-size: 14px; }
+.text-button { display: inline-block; border: 0; background: none; color: t.$primary-red; font: inherit; font-size: 14px; font-weight: 700; padding: 12px 0; cursor: pointer; text-decoration: underline; text-underline-offset: 4px; }
+.feedback-panel { display: grid; grid-template-rows: 0fr; visibility: hidden; transition: grid-template-rows .2s, visibility .2s; }
+.feedback-panel.open { grid-template-rows: 1fr; visibility: visible; }
+.panel-inner { overflow: hidden; min-height: 0; }
+form { padding: 8px 4px; }
+label { display: block; font-size: 14px; font-weight: 600; margin: 8px 0; }
+textarea { box-sizing: border-box; width: 100%; resize: vertical; border: 1px solid t.$border-color; border-radius: 10px; padding: 12px; font: inherit; }
+textarea:focus-visible { outline: 3px solid t.$focus-color; outline-offset: 2px; }
+.counter { text-align: right; margin: 6px 0 12px; font-size: 12px; }
+.primary { background: t.$primary-red; color: white; border: 0; padding: 12px 20px; border-radius: 10px; font: inherit; cursor: pointer; }
+button:disabled { opacity: .6; cursor: wait; }
+.error { color: t.$error-text; }
+.success { color: t.$success-text; }
+@media (prefers-reduced-motion: reduce) { .feedback-panel { transition: none; } }
+
+.image-fallback { aspect-ratio: 8 / 5; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; padding: 24px; text-align: center; background: t.$warm-background; color: t.$text-secondary; }
+.image-fallback > span:first-child { color: t.$primary-red; font-size: 48px; }
+.image-fallback small { font-size: 12px; }
+.primary:hover { background: t.$primary-red-hover; }
+@media (prefers-reduced-motion: no-preference) { article { transition: box-shadow .2s; } article:hover { box-shadow: 0 14px 36px #30251912; } }

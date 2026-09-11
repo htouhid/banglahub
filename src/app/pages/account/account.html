@@ -4,6 +4,15 @@
     <p role="status">Checking your session…</p>
   } @else if (auth.user(); as user) {
     <p class="email">Welcome, {{ user.email || 'Bangla Hub member' }}</p>
+    <dl class="profile-details">
+      <div><dt>First Name</dt><dd>{{ auth.profile()?.first_name || 'Not provided' }}</dd></div>
+      <div><dt>Last Name</dt><dd>{{ auth.profile()?.last_name || 'Not provided' }}</dd></div>
+      <div><dt>Email</dt><dd>{{ user.email || 'Not provided' }}</dd></div>
+      <div><dt>City</dt><dd>{{ auth.profile()?.city || 'Not provided' }}</dd></div>
+      <div><dt>State</dt><dd>{{ auth.profile()?.state || 'Not provided' }}</dd></div>
+      <div><dt>Sex</dt><dd>{{ sexLabel(auth.profile()?.sex) }}</dd></div>
+      <div><dt>Age Group</dt><dd>{{ auth.profile()?.age_group || 'Not provided' }}</dd></div>
+    </dl>
     <button type="button" [disabled]="auth.busy()" (click)="auth.logout()">
       {{ auth.busy() ? 'Signing out…' : 'Sign Out' }}
     </button>

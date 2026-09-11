@@ -1,0 +1,44 @@
+<article>
+  <div class="image-area">
+    @if (listing().image_url && !imageFailed()) {
+      <img class="listing-image" [src]="listing().image_url" [alt]="listing().title" width="640" height="400" loading="lazy" decoding="async" (error)="imageFailed.set(true)" />
+    } @else {
+      <div class="image-fallback" role="img" [attr.aria-label]="'Photo unavailable for ' + listing().title">
+        <span aria-hidden="true">{{ listing().category === 'restaurant' ? '♨' : '✿' }}</span>
+        <span>Local favorites, waiting to be discovered</span>
+        <small>Photo coming soon</small>
+      </div>
+    }
+  </div>
+  <div class="card-content">
+    <span class="eyebrow">{{ listing().category === 'restaurant' ? 'RESTAURANT' : 'GROCERY' }}</span>
+    <h2>{{ listing().title }}</h2>
+    <address>{{ listing().address }}<br />{{ listing().city }}, {{ listing().state }}</address>
+    @if (listing().brief_review) { <p>{{ listing().brief_review }}</p> }
+    <section class="reviews" aria-label="Guest Reviews">
+      <h3>Guest Reviews</h3>
+      @if (loading()) { <p role="status">Loading reviews…</p> }
+      @else if (reviewError()) { <p role="alert">{{ reviewError() }}</p><button type="button" class="text-button" (click)="loadReviews()">Retry reviews</button> }
+      @else {
+        @for (review of reviews(); track review.id) { <blockquote>{{ review.feedback }}</blockquote> }
+        @empty { <p>No guest reviews yet.</p> }
+      }
+    </section>
+    @if (auth.user()) {
+      <button class="text-button" type="button" [disabled]="submitting()" [attr.aria-expanded]="expanded()" [attr.aria-controls]="'feedback-' + listing().id" (click)="expanded.set(!expanded())">Quick Feedback</button>
+      <div class="feedback-panel" [class.open]="expanded()" [attr.inert]="expanded() ? null : ''" [attr.aria-hidden]="!expanded()" [id]="'feedback-' + listing().id">
+        <div class="panel-inner">
+          <form (submit)="submit($event)">
+            <label [for]="'feedback-input-' + listing().id">Share your experience</label>
+            <textarea [id]="'feedback-input-' + listing().id" [formControl]="feedback" maxlength="500" rows="4" [readOnly]="submitting()" [attr.aria-describedby]="'counter-' + listing().id" [attr.aria-invalid]="feedback.touched && feedback.invalid"></textarea>
+            <p [id]="'counter-' + listing().id" class="counter">{{ feedback.value.length }} / 500</p>
+            @if (feedback.touched && feedback.invalid) { <p class="error" role="alert">Enter feedback between 1 and 500 characters, excluding blank responses.</p> }
+            <button class="primary" type="submit" [disabled]="submitting()">{{ submitting() ? 'Submitting…' : 'Submit Feedback' }}</button>
+          </form>
+        </div>
+      </div>
+    } @else { <a class="text-button" routerLink="/sign-in" [queryParams]="{ returnUrl: listing().category === 'restaurant' ? '/local/restaurants' : '/local/groceries' }">Quick Feedback · Sign in to share</a> }
+    @if (error()) { <p class="error" role="alert">{{ error() }}</p> }
+    @if (success()) { <p class="success" role="status">{{ success() }}</p> }
+  </div>
+</article>
