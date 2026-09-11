@@ -1,4 +1,5 @@
 <article>
+  @if (!reviewsOnly()) {
   <div class="image-area">
     @if (listing().image_url && !imageFailed()) {
       <img class="listing-image" [src]="listing().image_url" [alt]="listing().title" width="640" height="400" loading="lazy" decoding="async" (error)="imageFailed.set(true)" />
@@ -10,11 +11,14 @@
       </div>
     }
   </div>
+  }
   <div class="card-content">
+    @if (!reviewsOnly()) {
     <span class="eyebrow">{{ listing().category === 'restaurant' ? 'RESTAURANT' : 'GROCERY' }}</span>
     <h2>{{ listing().title }}</h2>
     <address>{{ listing().address }}<br />{{ listing().city }}, {{ listing().state }}</address>
     @if (listing().brief_review) { <p>{{ listing().brief_review }}</p> }
+    }
     <section class="reviews" aria-label="Guest Reviews">
       <h3>Guest Reviews</h3>
       @if (loading()) { <p role="status">Loading reviews…</p> }

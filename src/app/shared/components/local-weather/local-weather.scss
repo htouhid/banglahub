@@ -1,0 +1,9 @@
+@use '../../../../styles/theme' as t;
+:host { display: block; min-width: 0; }
+.weather { height: 100%; box-sizing: border-box; padding: 18px; border: 1px solid t.$border-color; border-radius: 18px; background: t.$background; box-shadow: 0 6px 20px #30251906; }
+h2 { margin: 0 0 4px; font-size: 14px; line-height: 1.4; }
+.preview { font-size: 10px; color: t.$text-secondary; }
+.sun { display: block; color: #a75b00; font-size: 30px; margin: 12px 0 4px; }
+.temperature { display: block; font-size: 36px; letter-spacing: -1px; line-height: 1.1; }
+p { font-size: 12px; margin: 8px 0 0; color: t.$text-secondary; }
+.range { display: flex; gap: 10px; flex-wrap: wrap; }

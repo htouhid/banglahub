@@ -1,0 +1,8 @@
+<section class="weather" aria-label="Local weather preview">
+  <h2>{{ weather().city }}, {{ weather().state }}</h2>
+  <span class="preview">Sample weather</span>
+  <span class="sun" aria-hidden="true">☀</span>
+  <strong class="temperature">{{ weather().temperature }}°F</strong>
+  <p>{{ weather().condition }}</p>
+  <p class="range"><span>H: {{ weather().high }}°</span> <span>L: {{ weather().low }}°</span></p>
+</section>

@@ -14,6 +14,7 @@ export const routes: Routes = [
   { path: 'sign-in', component: SignIn, title: 'Sign In | Bangla Hub' },
   { path: 'sign-up', component: SignUp, title: 'Sign Up | Bangla Hub' },
   { path: 'sign-up-success', component: SignUpSuccess, title: 'Thank you | Bangla Hub' },
+  { path: 'news', loadComponent: () => import('./pages/news/news').then(m => m.News), title: 'Bangladesh News | Bangla Hub' },
   { path: 'account', component: Account, title: 'My Account | Bangla Hub' },
   ...['businesses', 'events', 'jobs', 'community', 'about', 'contact', 'privacy', 'terms'].map((path) => ({
     path,

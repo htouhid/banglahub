@@ -1,3 +1,5 @@
+import { signal } from '@angular/core';
+import { NewsService } from './core/services/news.service';
 import { Type } from '@angular/core';
 import { SignIn } from './pages/sign-in/sign-in';
 import { SignUp } from './pages/sign-up/sign-up';
@@ -29,7 +31,7 @@ describe('Routed pages', () => {
     auth.getSession.mockResolvedValue({ data: { session: null }, error: null });
     await TestBed.configureTestingModule({
       imports: [Home, Header, SignIn, SignUp, Account],
-      providers: [provideRouter(routes), { provide: SupabaseService, useValue: auth }],
+      providers: [{ provide: NewsService, useValue: { items: signal([]), loading: signal(false), error: signal(''), stale: signal(false) } }, provideRouter(routes), { provide: SupabaseService, useValue: auth }],
     }).compileComponents();
   });
 
@@ -52,7 +54,7 @@ describe('Routed pages', () => {
   it('renders a public marketplace home without authentication fields', async () => {
     const fixture = await render(Home);
     const element = fixture.nativeElement as HTMLElement;
-    expect(element.querySelector('h1')?.textContent).toContain('Bangla community');
+    expect(element.querySelector('h1')?.textContent).toContain('Bengali community');
     expect(element.querySelector('input[type="password"]')).toBeNull();
     expect(element.querySelector('input[type="email"]')).toBeNull();
     expect(element.querySelectorAll('.category-card')).toHaveLength(6);
@@ -62,9 +64,11 @@ describe('Routed pages', () => {
     element.querySelector<HTMLButtonElement>('.business-cta button')!.click();
     fixture.detectChanges();
     expect(element.querySelector('.business-cta [role="status"]')?.textContent).toContain('Business listings are coming soon');
-    element.querySelector('form')!.dispatchEvent(new Event('submit', { cancelable: true }));
-    fixture.detectChanges();
-    expect(element.querySelector('[role="status"]')?.textContent).toContain('coming soon');
+    expect(element.querySelector('.hero form')).toBeNull();
+    expect(element.querySelector('app-local-weather')?.textContent).toContain('78°F');
+    expect(element.querySelector('app-local-weather')?.textContent).toContain('Austin, TX');
+    expect(element.querySelector('app-local-news')?.textContent).toContain('No headlines available yet.');
+    expect(element.querySelector('app-local-news a')?.getAttribute('href')).toBe('/news');
   });
 
   it('routes each URL to its dedicated page', async () => {

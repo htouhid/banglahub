@@ -1,0 +1,29 @@
+<section class="slider" aria-label="Restaurant highlights" aria-roledescription="carousel">
+  @if (selectedListing(); as selected) {
+    <div class="visual">
+      <div class="track" [style.transform]="'translateX(-' + selectedIndex() * 100 + '%)'">
+      @for (item of listings(); track item.id; let index = $index) {
+        <article class="slide" [attr.aria-hidden]="index !== selectedIndex()" role="group" aria-roledescription="slide" [attr.aria-label]="item.title">
+          @if (item.image_url && !failedImages().has(item.id)) {
+            <img [src]="item.image_url" [alt]="item.title" width="1200" height="675" [loading]="index === 0 ? 'eager' : 'lazy'" (error)="imageError(item.id)" />
+          } @else { <div class="image-fallback" role="img" [attr.aria-label]="'Photo unavailable for ' + item.title"><span aria-hidden="true">♨</span><span>Photo coming soon</span></div> }
+          <div class="overlay"><h2>{{ item.title }}</h2><p class="location">{{ item.city }}, {{ item.state }}</p>@if (item.brief_review) { <blockquote class="brief">“{{ item.brief_review }}”</blockquote> }<address>{{ item.address }}</address></div>
+        </article>
+      }
+      </div>
+      @if (listings().length > 1) {
+        <button type="button" class="arrow previous" aria-label="Previous restaurant" (click)="move(-1, $event)">‹</button>
+        <button type="button" class="arrow next" aria-label="Next restaurant" (click)="move(1, $event)">›</button>
+      }
+    </div>
+    <div class="selectors" role="group" aria-label="Choose a restaurant">
+      @for (item of listings(); track item.id; let index = $index) {
+        <button class="selector" type="button" [class.active]="item.id === selected.id" [attr.aria-pressed]="item.id === selected.id" [attr.aria-current]="index === selectedIndex() ? 'true' : null" (keydown)="selectorKey($event, index)" (click)="select(index, $event)">{{ item.title }}</button>
+      }
+    </div>
+    <p class="selection-status" role="status">Selected restaurant: {{ selected.title }}</p>
+    @for (item of [selected]; track item.id) {
+      <app-listing-card [listing]="item" [reviewsOnly]="true" />
+    }
+  } @else { <p class="empty" role="status">No restaurants found. Try another search or check back soon.</p> }
+</section>

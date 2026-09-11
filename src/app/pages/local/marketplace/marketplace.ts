@@ -1,3 +1,4 @@
+import { LocalListingSlider } from '../../../shared/components/local-listing-slider/local-listing-slider';
 import { afterNextRender, Component, computed, inject, Injector, input, PendingTasks, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { SupabaseService } from '../../../core/services/supabase.service';
@@ -6,7 +7,7 @@ import { ListingCard } from '../listing-card/listing-card';
 
 @Component({
   selector: 'app-local-marketplace',
-  imports: [ReactiveFormsModule, ListingCard],
+  imports: [ReactiveFormsModule, ListingCard, LocalListingSlider],
   templateUrl: './marketplace.html',
   styleUrl: './marketplace.scss',
 })

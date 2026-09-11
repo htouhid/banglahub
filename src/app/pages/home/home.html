@@ -1,15 +1,12 @@
 <section class="hero" aria-labelledby="hero-heading">
   <div class="hero-copy">
     <span class="eyebrow">ROOTED IN CULTURE. CONNECTED BY COMMUNITY.</span>
-    <h1 id="hero-heading">Discover your <span>Bangla community</span></h1>
+    <h1 id="hero-heading">Discover your <span>Bengali community</span></h1>
     <p>Find local businesses, events, jobs, services, and people near you. A little piece of home, wherever you are.</p>
-    <form class="search-bar" role="search" (submit)="search($event)">
-      <div class="search-field"><label for="community-search">What are you looking for?</label><input id="community-search" name="query" type="search" placeholder="Search businesses, services, events..." /></div>
-      <div class="location-field"><label for="community-location">Where?</label><input id="community-location" name="location" type="text" placeholder="Your Location" autocomplete="address-level2" /></div>
-      <button class="primary" type="submit">Search <span aria-hidden="true">↗</span></button>
-    </form>
-    @if (searchMessage()) { <p class="notice" role="status">{{ searchMessage() }}</p> }
-    <p class="hero-note"><span aria-hidden="true">✦</span> Local discoveries. Meaningful connections.</p>
+    <div class="hero-info">
+      <app-local-weather />
+      <app-local-news />
+    </div>
   </div>
   <div class="hero-visual">
     <img src="images/austin_downtown.png" width="800" height="620" fetchpriority="high" alt="Original illustration of neighbors connecting outside local shops on a tree-lined street" />

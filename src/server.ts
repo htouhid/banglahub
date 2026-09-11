@@ -1,3 +1,4 @@
+import { newsHandler } from './server/news/news-api';
 import {
   AngularNodeAppEngine,
   createNodeRequestHandler,
@@ -11,6 +12,8 @@ const browserDistFolder = join(import.meta.dirname, '../browser');
 
 const app = express();
 const angularApp = new AngularNodeAppEngine();
+
+app.get('/api/news', newsHandler);
 
 /**
  * Example Express Rest API endpoints can be defined here.

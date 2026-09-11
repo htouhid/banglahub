@@ -1,0 +1,13 @@
+<section class="news" aria-label="Local News" [attr.aria-busy]="news.loading()">
+  <header><h2>Local News</h2><a routerLink="/news">View All <span aria-hidden="true">→</span></a></header>
+  @if (news.loading()) { <p role="status">Loading latest headlines…</p> }
+  @else if (news.error()) { <p role="alert">{{ news.error() }}</p><button type="button" (click)="news.load()">Try again</button> }
+  @else if (news.items()[0]; as item) {
+    <span class="preview">{{ item.source }}</span>
+    <article [class.no-image]="!item.imageUrl || failedImage() === item.url">
+      @if (item.imageUrl && failedImage() !== item.url) { <img [src]="item.imageUrl" [alt]="item.title" width="480" height="280" loading="lazy" decoding="async" (error)="failedImage.set(item.url)" /> }
+      <div><h3><a [href]="item.url" target="_blank" rel="noopener noreferrer">{{ item.title }}</a></h3>@if (item.summary) { <p class="summary">{{ item.summary }}</p> }<time [attr.datetime]="item.publishedAt">{{ item.publishedAt | date:'mediumDate':'UTC' }}</time></div>
+    </article>
+    @if (news.stale()) { <p>Showing recently cached headlines.</p> }
+  } @else { <p>No headlines available yet.</p> }
+</section>

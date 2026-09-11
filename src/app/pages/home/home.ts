@@ -1,3 +1,5 @@
+import { LocalWeatherComponent } from '../../shared/components/local-weather/local-weather';
+import { LocalNewsComponent } from '../../shared/components/local-news/local-news';
 import { DOCUMENT } from '@angular/common';
 import { MatTabsModule } from '@angular/material/tabs';
 import { toSignal } from '@angular/core/rxjs-interop';
@@ -8,7 +10,7 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-home',
-  imports: [RouterLink, MatTabsModule, Restaurants, Groceries],
+  imports: [LocalWeatherComponent, LocalNewsComponent, RouterLink, MatTabsModule, Restaurants, Groceries],
   templateUrl: './home.html',
   styleUrl: './home.scss',
 })
@@ -59,11 +61,7 @@ export class Home {
     { title: 'A community afternoon', category: 'Community event', city: 'Jersey City, NJ', image: 'events', description: 'An afternoon of conversation, culture, and new connections.' },
     { title: 'A new place to call home', category: 'Rentals', city: 'Brooklyn, NY', image: 'rentals', description: 'Imagine your next chapter in a neighborhood that feels familiar.' },
   ];
-  protected readonly searchMessage = signal('');
   protected readonly businessMessage = signal('');
 
-  protected search(event: Event): void {
-    event.preventDefault();
-    this.searchMessage.set('Community search is coming soon. Explore the categories below for a preview.');
-  }
+
 }

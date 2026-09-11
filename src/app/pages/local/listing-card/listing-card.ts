@@ -10,6 +10,7 @@ import type { GuestReview, LocalListing } from '../../../core/models/local-listi
   templateUrl: './listing-card.html', styleUrl: './listing-card.scss',
 })
 export class ListingCard {
+  readonly reviewsOnly = input(false);
   readonly listing = input.required<LocalListing>();
   protected readonly auth = inject(AuthStateService);
   private readonly injector = inject(Injector);
