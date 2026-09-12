@@ -1,11 +1,11 @@
 import { isPlatformBrowser } from '@angular/common';
 import { afterNextRender, Component, computed, DestroyRef, effect, inject, PLATFORM_ID, signal } from '@angular/core';
-import { AuthStateService } from '../../../core/services/auth-state.service';
+import { CityContextService } from '../../../core/services/city-context.service';
 import { WeatherService, type WeatherCoordinates, type WeatherReading } from '../../../core/services/weather.service';
 
 @Component({ selector: 'app-local-weather', templateUrl: './local-weather.html', styleUrl: './local-weather.scss' })
 export class LocalWeatherComponent {
-  private readonly auth = inject(AuthStateService);
+  private readonly cityContext = inject(CityContextService);
   private readonly service = inject(WeatherService);
   private readonly browser = isPlatformBrowser(inject(PLATFORM_ID));
   private readonly destroyRef = inject(DestroyRef);
@@ -17,24 +17,19 @@ export class LocalWeatherComponent {
   readonly locating = signal(false);
   readonly loading = signal(true);
   readonly notice = signal('');
-  readonly profileQuery = computed(() => {
-    const profile = this.auth.profile();
-    const city = profile?.city?.trim();
-    const state = profile?.state?.trim();
-    return this.auth.user() && city && state ? `${city}, ${state}` : 'Austin, TX';
+  readonly browsingQuery = computed(() => {
+    const city = this.cityContext.selectedCity();
+    return `${city.name}, ${city.state}`;
   });
-  readonly location = computed(() => this.detectedLocation() ?? this.profileQuery());
+  readonly location = computed(() => this.detectedLocation() ?? this.browsingQuery());
   constructor() {
     afterNextRender(() => this.ready.set(true));
     effect(() => {
-      this.auth.user()?.id;
-      this.profileQuery();
+      const query = this.browsingQuery();
       this.locationRequestId++;
       this.detectedLocation.set(null);
       this.locating.set(false);
-    });
-    effect(() => {
-      const query = this.profileQuery();
+      this.notice.set('');
       if (this.browser && this.ready()) void this.load(query);
     });
   }
@@ -49,7 +44,7 @@ export class LocalWeatherComponent {
   }
   protected useCurrentLocation(): void {
     if (!this.browser || this.locating()) return;
-    if (!navigator.geolocation) { this.notice.set('Using your saved or default location.'); return; }
+    if (!navigator.geolocation) { this.notice.set('Using your selected city.'); return; }
     const id = ++this.locationRequestId;
     this.locating.set(true); this.notice.set('');
     navigator.geolocation.getCurrentPosition(async position => {
@@ -64,12 +59,12 @@ export class LocalWeatherComponent {
       catch { /* Weather remains useful even when reverse geocoding is unavailable. */ }
       if (id !== this.locationRequestId || this.destroyRef.destroyed) return;
       this.detectedLocation.set(label);
-      await this.load(this.profileQuery(), coordinates);
+      await this.load(this.browsingQuery(), coordinates);
       if (id === this.locationRequestId && !this.destroyRef.destroyed) this.locating.set(false);
     }, () => {
       if (id !== this.locationRequestId || this.destroyRef.destroyed) return;
       this.locating.set(false); this.detectedLocation.set(null);
-      this.notice.set('Using your saved or default location.');
+      this.notice.set('Using your selected city.');
     }, { enableHighAccuracy: false, timeout: 10000, maximumAge: 300000 });
   }
 }

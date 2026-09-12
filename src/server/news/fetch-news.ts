@@ -1,9 +1,9 @@
 /// <reference types="node" />
-import { NEWS_QUERY, normalizeNewsApi } from './newsapi';
+import { CITY_NEWS_QUERIES, type NewsCity, normalizeNewsApi } from './newsapi';
 import type { NewsItem } from '../../app/core/models/news';
 
 export class NewsConfigurationError extends Error {}
-export async function fetchNewsItems(): Promise<NewsItem[]> {
+export async function fetchNewsItems(city: NewsCity = 'austin'): Promise<NewsItem[]> {
   const key = process.env['NEWS_API_KEY']?.trim();
   if (!key) {
     console.error('NEWS_FETCH_FAILED', { message: 'NEWS_API_KEY is not configured' });
@@ -12,7 +12,7 @@ export async function fetchNewsItems(): Promise<NewsItem[]> {
   let status: number | undefined;
   try {
     const url = new URL('https://newsapi.org/v2/everything');
-    url.search = new URLSearchParams({ q: NEWS_QUERY, language: 'en', sortBy: 'publishedAt', pageSize: '15' }).toString();
+    url.search = new URLSearchParams({ q: CITY_NEWS_QUERIES[city], language: 'en', sortBy: 'publishedAt', pageSize: '20' }).toString();
     const response = await fetch(url, {
       signal: AbortSignal.timeout(10000), headers: { 'X-Api-Key': key, Accept: 'application/json' },
     });

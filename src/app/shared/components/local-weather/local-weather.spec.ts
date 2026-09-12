@@ -1,3 +1,4 @@
+import { CityContextService } from '../../../core/services/city-context.service';
 import { signal, PLATFORM_ID } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { vi } from 'vitest';
@@ -12,6 +13,7 @@ describe('Local weather location', () => {
   const locate = vi.fn();
   const reverseGeocode = vi.fn();
   beforeEach(() => {
+    sessionStorage.clear();
     user.set({ id: 'member' });
     profile.set({ city: ' Atlanta ', state: 'GA' });
     getWeather.mockReset().mockResolvedValue({ temperature: 72, condition: 'Partly cloudy', high: 80, low: 60, icon: '☁' });
@@ -42,14 +44,34 @@ describe('Local weather location', () => {
     profile.set(null);
     const fixture = await render();
     expect(getWeather).toHaveBeenLastCalledWith('Austin, TX', undefined);
-    profile.set({ city: 'Queens', state: 'NY' });
+    profile.set({ city: 'Houston', state: 'TX' });
     fixture.detectChanges();
     await fixture.whenStable();
-    expect(getWeather).toHaveBeenLastCalledWith('Queens, NY', undefined);
+    expect(getWeather).toHaveBeenLastCalledWith('Houston, TX', undefined);
     user.set(null);
     fixture.detectChanges();
     await fixture.whenStable();
     expect(getWeather).toHaveBeenLastCalledWith('Austin, TX', undefined);
+  });
+  it('reloads once per browsing city and leaves the saved profile unchanged', async () => {
+    const fixture = await render();
+    const context = TestBed.inject(CityContextService);
+    for (const [key, query] of [['austin', 'Austin, TX'], ['dallas', 'Dallas, TX'], ['houston', 'Houston, TX'], ['chicago', 'Chicago, IL'], ['atlanta', 'Atlanta, GA']]) {
+      const before = getWeather.mock.calls.length;
+      context.selectCity(key);
+      fixture.detectChanges();
+      await fixture.whenStable();
+      fixture.detectChanges();
+      expect(getWeather).toHaveBeenLastCalledWith(query, undefined);
+      expect(getWeather).toHaveBeenCalledTimes(before + 1);
+      expect(fixture.nativeElement.textContent).toContain(query);
+      context.selectCity(key);
+      fixture.detectChanges();
+      expect(getWeather).toHaveBeenCalledTimes(before + 1);
+    }
+    expect(profile()).toEqual({ city: ' Atlanta ', state: 'GA' });
+    expect(locate).not.toHaveBeenCalled();
+    sessionStorage.clear();
   });
   it('requests coordinates only on click and uses them for weather', async () => {
     const fixture = await render();

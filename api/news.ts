@@ -1,10 +1,11 @@
+import { newsCity } from '../src/server/news/newsapi';
 import { fetchNewsItems, NewsConfigurationError } from '../src/server/news/fetch-news';
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import type { NewsItem } from '../src/app/core/models/news';
 
 const TTL = 15 * 60 * 1000;
-let cache: { items: NewsItem[]; fetchedAt: number } | undefined;
-let pending: Promise<NewsItem[]> | undefined;
+const caches = new Map<string, { items: NewsItem[]; fetchedAt: number }>();
+const requests = new Map<string, Promise<NewsItem[]>>();
 
 
 export default async function handler(req: VercelRequest, res: VercelResponse): Promise<void> {
@@ -15,13 +16,17 @@ export default async function handler(req: VercelRequest, res: VercelResponse): 
     res.status(405).json({ items: [], error: 'Method not allowed' });
     return;
   }
+  const city = newsCity(req.query?.['city']);
+  let cache = caches.get(city);
   try {
     if (!cache || Date.now() - cache.fetchedAt > TTL) {
-      pending ??= fetchNewsItems().then(items => {
-        cache = { items, fetchedAt: Date.now() };
+      const pending = requests.get(city) ?? fetchNewsItems(city).then(items => {
+        cache = { items, fetchedAt: Date.now() }; caches.set(city, cache);
         return items;
-      }).finally(() => { pending = undefined; });
+      }).finally(() => { requests.delete(city); });
+      requests.set(city, pending);
       await pending;
+      cache = caches.get(city);
     }
     res.setHeader('Cache-Control', 'public, max-age=0, s-maxage=900, stale-while-revalidate=60');
     res.status(200).json({ items: cache!.items });

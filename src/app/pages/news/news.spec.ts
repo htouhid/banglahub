@@ -9,7 +9,7 @@ import type { NewsItem } from '../../core/models/news';
 
 const item: NewsItem = { title: 'Test headline', source: 'Dhaka Tribune', url: 'https://www.dhakatribune.com/news/test', publishedAt: '2026-09-11T00:00:00Z', summary: 'Test summary' };
 describe('News views', () => {
-  const state = { items: signal<NewsItem[]>([]), loading: signal(false), error: signal(''), stale: signal(false), load: vi.fn() };
+  const state = { city: signal({name: 'Atlanta'}), items: signal<NewsItem[]>([]), loading: signal(false), error: signal(''), stale: signal(false), load: vi.fn() };
   beforeEach(() => {
     state.items.set([item]); state.loading.set(false); state.error.set('');
     TestBed.configureTestingModule({ providers: [provideRouter([]), { provide: NewsService, useValue: state }] });
@@ -23,6 +23,7 @@ describe('News views', () => {
   it('renders returned articles with safe external links and loading/error/empty states', () => {
     const fixture = TestBed.createComponent(News); fixture.detectChanges();
     expect(fixture.nativeElement.textContent).toContain('Test summary');
+    expect(fixture.nativeElement.textContent).toContain('Local News — Atlanta');
     const link = fixture.nativeElement.querySelector('article a') as HTMLAnchorElement;
     expect(link.href).toBe(item.url); expect(link.target).toBe('_blank'); expect(link.rel).toBe('noopener noreferrer');
     state.loading.set(true); fixture.detectChanges(); expect(fixture.nativeElement.textContent).toContain('Loading latest');

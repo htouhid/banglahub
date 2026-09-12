@@ -32,7 +32,7 @@ describe('Routed pages', () => {
     auth.getSession.mockResolvedValue({ data: { session: null }, error: null });
     await TestBed.configureTestingModule({
       imports: [Home, Header, SignIn, SignUp, Account],
-      providers: [{ provide: WeatherService, useValue: { getWeather: vi.fn().mockResolvedValue({ temperature: 78, condition: 'Sunny', high: 85, low: 62, icon: '☀' }) } }, { provide: NewsService, useValue: { items: signal([]), loading: signal(false), error: signal(''), stale: signal(false) } }, provideRouter(routes), { provide: SupabaseService, useValue: auth }],
+      providers: [{ provide: WeatherService, useValue: { getWeather: vi.fn().mockResolvedValue({ temperature: 78, condition: 'Sunny', high: 85, low: 62, icon: '☀' }) } }, { provide: NewsService, useValue: { city: signal({name: 'Austin'}), items: signal([]), loading: signal(false), error: signal(''), stale: signal(false) } }, provideRouter(routes), { provide: SupabaseService, useValue: auth }],
     }).compileComponents();
   });
 

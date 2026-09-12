@@ -1,5 +1,5 @@
 <section class="news-page">
-  <header><span class="eyebrow">BANGLAHUB · HEADLINES</span><h1>Bangladesh News</h1><p>Latest headlines from trusted English-language sources.</p></header>
+  <header><span class="eyebrow">BANGLAHUB · HEADLINES</span><h1>Local News — {{ news.city().name }}</h1><p>Latest headlines from trusted English-language sources.</p></header>
   @if (news.loading()) { <p role="status">Loading latest headlines…</p> }
   @else if (news.error()) { <div role="alert"><p>{{ news.error() }}</p><button type="button" (click)="news.load()">Try again</button></div> }
   @else {

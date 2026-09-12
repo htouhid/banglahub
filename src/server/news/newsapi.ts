@@ -1,5 +1,17 @@
 import type { NewsItem } from '../../app/core/models/news';
-export const NEWS_QUERY = 'Bangladesh OR Dhaka';
+export const CITY_NEWS_QUERIES = {
+  austin: '("Austin" OR "Central Texas")',
+  dallas: '("Dallas" OR "DFW" OR "North Texas")',
+  houston: '("Houston" OR "Greater Houston")',
+  chicago: '("Chicago" OR "Chicagoland")',
+  atlanta: '("Atlanta" OR "Metro Atlanta")',
+} as const;
+export type NewsCity = keyof typeof CITY_NEWS_QUERIES;
+export function newsCity(value: unknown): NewsCity {
+  const key = typeof value === 'string' ? value.toLowerCase() : '';
+  return Object.hasOwn(CITY_NEWS_QUERIES, key) ? key as NewsCity : 'austin';
+}
+export const NEWS_QUERY = CITY_NEWS_QUERIES.austin;
 const text = (value: unknown): string => typeof value === 'string' ? value.replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim() : '';
 function url(value: unknown): string | undefined {
   if (typeof value !== 'string') return undefined;
@@ -26,5 +38,5 @@ export function normalizeNewsApi(value: unknown): NewsItem[] {
       ...(summary ? { summary } : {}), ...(imageUrl ? { imageUrl } : {}),
     });
   }
-  return [...items.values()].sort((a, b) => b.publishedAt.localeCompare(a.publishedAt)).slice(0, 15);
+  return [...items.values()].sort((a, b) => b.publishedAt.localeCompare(a.publishedAt)).slice(0, 20);
 }
