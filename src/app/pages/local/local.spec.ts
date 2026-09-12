@@ -13,7 +13,7 @@ import { SupabaseService } from '../../core/services/supabase.service';
 import { AuthStateService } from '../../core/services/auth-state.service';
 import type { LocalListing } from '../../core/models/local-listing';
 
-const listing: LocalListing = { id: 'listing-1', category: 'restaurant', title: 'Deshi Kitchen', image_url: null, address: '1 Main St', city: 'Austin', state: 'TX', brief_review: 'Fresh favorites', is_active: true };
+const listing: LocalListing = { id: 'listing-1', category: 'restaurant', title: 'Deshi Kitchen', image_url: null, address: '1 Main St', city: 'Austin', market_city: 'Austin', state: 'TX', brief_review: 'Fresh favorites', is_active: true };
 describe('Local marketplace', () => {
   const api = { getListingsByCategory: vi.fn(), getApprovedReviews: vi.fn(), submitReview: vi.fn() };
   const auth = { profile: signal<{city: string; state: string} | null>(null), user: signal<{ id: string } | null>({ id: 'user-1' }) };
@@ -74,7 +74,7 @@ describe('Local marketplace', () => {
 
   it('initializes Houston from profile and reloads through hero city buttons', async () => {
     auth.profile.set({city: 'Houston', state: 'TX'});
-    const houston = {...listing, id: 'houston', title: 'Houston Kitchen', city: 'Houston'};
+    const houston = {...listing, id: 'houston', title: 'Houston Kitchen', city: 'Katy', market_city: 'Houston'};
     api.getListingsByCategory.mockImplementation(async (_category, city) => city === 'Houston' ? [houston, listing] : [listing]);
     const harness = await RouterTestingHarness.create('/local/restaurants');
     await harness.fixture.whenStable();

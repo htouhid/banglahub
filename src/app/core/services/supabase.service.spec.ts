@@ -36,7 +36,7 @@ describe('SupabaseService signup', () => {
     insert.mockResolvedValue({ error: null });
     const service = TestBed.inject(SupabaseService);
     await service.getListingsByCategory('restaurant', 'Houston', 'TX');
-    expect(ilike).toHaveBeenCalledWith('city', 'Houston');
+    expect(ilike).toHaveBeenCalledWith('market_city', 'Houston');
     expect(ilike).toHaveBeenCalledWith('state', 'TX');
     expect(from).toHaveBeenCalledWith('local_listings');
     expect(eq).toHaveBeenCalledWith('category', 'restaurant');

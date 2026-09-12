@@ -1,0 +1,179 @@
+<section class="listing-form-page">
+
+  <div class="form-header">
+    <div>
+      <h1>
+        {{ isEditMode ? 'Edit Listing' : 'Add Listing' }}
+      </h1>
+
+      <p>
+        {{ isEditMode
+          ? 'Update the local listing information.'
+          : 'Create a new local listing.'
+        }}
+      </p>
+    </div>
+
+    <a routerLink="/admin/listings">
+      Back to Listings
+    </a>
+  </div>
+
+  @if (loading) {
+    <p>Loading listing...</p>
+  }
+
+  @if (errorMessage) {
+    <p class="error-message">
+      {{ errorMessage }}
+    </p>
+  }
+
+  @if (!loading) {
+
+    <form
+      [formGroup]="listingForm"
+      (ngSubmit)="saveListing()"
+    >
+
+      <div class="form-group">
+        <label for="title">Title</label>
+
+        <input
+          id="title"
+          type="text"
+          formControlName="title"
+        />
+
+        @if (
+          listingForm.get('title')?.touched &&
+          listingForm.get('title')?.invalid
+        ) {
+          <small>Title is required.</small>
+        }
+      </div>
+
+      <div class="form-group">
+        <label for="category">Category</label>
+
+        <select
+          id="category"
+          formControlName="category"
+        >
+          @for (category of categories; track category) {
+            <option [value]="category">
+              {{ category }}
+            </option>
+          }
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="address">Address</label>
+
+        <input
+          id="address"
+          type="text"
+          formControlName="address"
+        />
+      </div>
+
+      <div class="form-row">
+
+        <div class="form-group">
+          <label for="city">City</label>
+
+          <input
+            id="city"
+            type="text"
+            formControlName="city"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="state">State</label>
+
+          <input
+            id="state"
+            type="text"
+            formControlName="state"
+          />
+        </div>
+
+      </div>
+
+      <div class="form-group">
+        <label for="market_city">Market / Metro Area</label>
+        <select id="market_city" formControlName="market_city" required
+          aria-describedby="market-help">
+          <option value="">Select a market</option>
+          @for (market of markets; track market.key) {
+            <option [value]="market.name">{{ market.name }}</option>
+          }
+        </select>
+        <small id="market-help">Choose the BanglaHub browsing market. Keep the physical city above.</small>
+        @if (listingForm.get('market_city')?.touched && listingForm.get('market_city')?.invalid) {
+          <small role="alert">Select a supported market.</small>
+        }
+      </div>
+
+      <div class="form-group">
+        <label for="brief_review">
+          Brief Review
+        </label>
+
+        <textarea
+          id="brief_review"
+          rows="5"
+          formControlName="brief_review"
+        ></textarea>
+      </div>
+
+      <div class="form-group">
+        <label for="image_url">
+          Image URL
+        </label>
+
+        <input
+          id="image_url"
+          type="text"
+          formControlName="image_url"
+        />
+      </div>
+
+      <div class="checkbox-group">
+
+        <input
+          id="is_active"
+          type="checkbox"
+          formControlName="is_active"
+        />
+
+        <label for="is_active">
+          Active
+        </label>
+
+      </div>
+
+      <div class="form-actions">
+
+        <button
+          type="submit"
+          [disabled]="saving"
+        >
+          {{ saving
+            ? 'Saving...'
+            : (isEditMode ? 'Update Listing' : 'Create Listing')
+          }}
+        </button>
+
+        <a routerLink="/admin/listings">
+          Cancel
+        </a>
+
+      </div>
+
+    </form>
+  }
+
+</section>

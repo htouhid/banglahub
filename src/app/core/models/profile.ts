@@ -36,6 +36,7 @@ export interface UserProfile {
   state: string | null;
   sex: string | null;
   age_group: string | null;
+  role: 'user' | 'admin';
   id: string;
   created_at: string;
   updated_at: string;

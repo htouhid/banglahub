@@ -6,8 +6,40 @@ import { SignUp } from './pages/sign-up/sign-up';
 import { Account } from './pages/account/account';
 import { Home } from './pages/home/home';
 import { Placeholder } from './pages/placeholder/placeholder';
+import { adminGuard } from './core/guards/admin-guard';
 
 export const routes: Routes = [
+
+{
+  path: 'admin',
+  canActivate: [adminGuard],
+  children: [
+    {
+      path: '',
+      pathMatch: 'full',
+      redirectTo: 'listings'
+    },
+    {
+      path: 'listings',
+      loadComponent: () =>
+        import('./admin/admin-listings/admin-listings')
+          .then(m => m.AdminListings)
+    },
+    {
+      path: 'listings/new',
+      loadComponent: () =>
+        import('./admin/admin-listing-form/admin-listing-form')
+          .then(m => m.AdminListingForm)
+    },
+    {
+      path: 'listings/:id/edit',
+      loadComponent: () =>
+        import('./admin/admin-listing-form/admin-listing-form')
+          .then(m => m.AdminListingForm)
+    }
+  ]
+},  // <-- THIS COMMA IS IMPORTANT
+  
   { path: '', component: Home, pathMatch: 'full', title: 'Bangla Hub' },
   { path: 'local/restaurants', redirectTo: () => inject(Router).createUrlTree(['/'], { queryParams: { category: 'restaurants' } }) },
   { path: 'local/groceries', redirectTo: () => inject(Router).createUrlTree(['/'], { queryParams: { category: 'groceries' } }) },

@@ -1,0 +1,139 @@
+<section class="admin-listings">
+
+  <div class="admin-header">
+    <div>
+      <h1>Local Listings</h1>
+      <p>Manage restaurants, groceries and other local listings.</p>
+    </div>
+
+    <a
+      routerLink="/admin/listings/new"
+      class="add-button">
+      Add Listing
+    </a>
+  </div>
+
+  @if (loading()) {
+    <p>Loading listings...</p>
+  }
+
+  @if (errorMessage()) {
+    <p class="error-message">
+      {{ errorMessage() }}
+    </p>
+  }
+
+  @if (!loading() && !errorMessage()) {
+
+    <div class="table-wrapper">
+
+      <table>
+
+        <thead>
+          <tr>
+            <th>Image</th>
+            <th>Title</th>
+            <th>Category</th>
+            <th>Physical City</th>
+            <th>Market</th>
+            <th>State</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+
+        <tbody>
+
+          @for (listing of listings(); track listing.id) {
+
+            <tr>
+
+              <td>
+                @if (listing.image_url) {
+                  <img
+                    [src]="listing.image_url"
+                    [alt]="listing.title"
+                    class="listing-image"
+                  />
+                } @else {
+                  <span>No image</span>
+                }
+              </td>
+
+              <td>{{ listing.title }}</td>
+
+              <td>{{ listing.category }}</td>
+
+              <td>{{ listing.city }}</td>
+
+              <td>{{ listing.market_city }}</td>
+
+              <td>{{ listing.state }}</td>
+
+              <td>
+                @if (listing.is_active) {
+                  <span class="status active">
+                    Active
+                  </span>
+                } @else {
+                  <span class="status inactive">
+                    Inactive
+                  </span>
+                }
+              </td>
+
+              <td class="actions">
+
+                <a
+                  [routerLink]="[
+                    '/admin/listings',
+                    listing.id,
+                    'edit'
+                  ]">
+                  Edit
+                </a>
+
+                @if (listing.is_active) {
+                  <button
+                    type="button"
+                    (click)="deactivateListing(listing)">
+                    Deactivate
+                  </button>
+                } @else {
+                  <button
+                    type="button"
+                    (click)="activateListing(listing)">
+                    Activate
+                  </button>
+                }
+
+                <button
+                  type="button"
+                  class="delete-button"
+                  (click)="deleteListing(listing)">
+                  Delete
+                </button>
+
+              </td>
+
+            </tr>
+
+          } @empty {
+
+            <tr>
+              <td colspan="8" class="no-listings">
+                No listings found.
+              </td>
+            </tr>
+
+          }
+
+        </tbody>
+
+      </table>
+
+    </div>
+
+  }
+
+</section>

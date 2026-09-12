@@ -55,7 +55,7 @@ export class Marketplace {
         : await api.getListingsByCategory(this.category());
       if (id === this.requestId && !this.destroyRef.destroyed) {
         this.listings.set(city ? rows.filter(row =>
-          row.city.trim().toLowerCase() === city.name.toLowerCase() &&
+          row.market_city?.trim().toLowerCase() === city.name.toLowerCase() &&
           row.state.trim().toUpperCase() === city.state.toUpperCase()) : rows);
       }
     } catch {

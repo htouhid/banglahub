@@ -1,4 +1,3 @@
-import type { LocalListing, ListingCategory, GuestReview } from '../models/local-listing';
 import { Injectable } from '@angular/core';
 import {
   createClient,
@@ -9,6 +8,14 @@ import {
   type AuthChangeEvent,
   type Session,
 } from '@supabase/supabase-js';
+
+import type {
+  LocalListing,
+  ListingCategory,
+  GuestReview,
+  CreateLocalListing,
+  UpdateLocalListing
+} from '../models/local-listing';
 
 import type { SignUpProfile, UserProfile } from '../models/profile';
 import { environment } from '../../../environments/environment';
@@ -26,20 +33,37 @@ export class SupabaseService {
     return this.client.auth.onAuthStateChange(callback);
   }
 
-  async getProfile(userId: string): Promise<UserProfile | null> {
-    const { data, error } = await this.client.schema('public').from('profiles')
-      .select('id, first_name, last_name, city, state, sex, age_group, created_at, updated_at')
-      .eq('id', userId).maybeSingle<UserProfile>();
-    if (error) throw error;
-    return data;
-  }
+async getProfile(userId: string): Promise<UserProfile | null> {
+  const { data, error } = await this.client
+    .schema('public')
+    .from('profiles')
+    .select(`
+      id,
+      first_name,
+      last_name,
+      city,
+      state,
+      sex,
+      age_group,
+      role,
+      created_at,
+      updated_at
+    `)
+    .eq('id', userId)
+    .maybeSingle<UserProfile>();
 
-  async getListingsByCategory(category: ListingCategory, city?: string, state?: string): Promise<LocalListing[]> {
+  if (error) throw error;
+
+  return data;
+}
+
+  async getListingsByCategory(category: ListingCategory, marketCity?: string, state?: string): Promise<LocalListing[]> {
     let query = this.client.schema('public').from('local_listings')
       .select('*').eq('category', category).eq('is_active', true);
-    if (city && state) {
+    if (marketCity) {
       const literal = (value: string) => value.trim().replace(/[\\%_]/g, character => '\\' + character);
-      query = query.ilike('city', literal(city)).ilike('state', literal(state));
+      query = query.ilike('market_city', literal(marketCity));
+      if (state) query = query.ilike('state', literal(state));
     }
     const { data, error } = await query.order('title').returns<LocalListing[]>();
     if (error) throw error;
@@ -82,4 +106,75 @@ export class SupabaseService {
   getUser(): Promise<UserResponse> {
     return this.client.auth.getUser();
   }
+  
+async getAllListings(): Promise<LocalListing[]> {
+  const { data, error } = await this.client
+    .schema('public')
+    .from('local_listings')
+    .select('*')
+    .order('city')
+    .order('title')
+    .returns<LocalListing[]>();
+
+  if (error) throw error;
+
+  return data ?? [];
+}
+
+async getListingById(id: string): Promise<LocalListing | null> {
+  const { data, error } = await this.client
+    .schema('public')
+    .from('local_listings')
+    .select('*')
+    .eq('id', id)
+    .maybeSingle<LocalListing>();
+
+  if (error) throw error;
+
+  return data;
+}
+
+async createListing(
+  listing: CreateLocalListing
+): Promise<LocalListing> {
+  const { data, error } = await this.client
+    .schema('public')
+    .from('local_listings')
+    .insert(listing)
+    .select('*')
+    .single<LocalListing>();
+
+  if (error) throw error;
+
+  return data;
+}
+
+async updateListing(
+  id: string,
+  listing: UpdateLocalListing
+): Promise<LocalListing> {
+  const { data, error } = await this.client
+    .schema('public')
+    .from('local_listings')
+    .update(listing)
+    .eq('id', id)
+    .select('*')
+    .single<LocalListing>();
+
+  if (error) throw error;
+
+  return data;
+}
+
+async deleteListing(id: string): Promise<void> {
+  const { error } = await this.client
+    .schema('public')
+    .from('local_listings')
+    .delete()
+    .eq('id', id);
+
+  if (error) throw error;
+}
+
+
 }

@@ -7,7 +7,7 @@ import { SupabaseService } from '../../../core/services/supabase.service';
 import { AuthStateService } from '../../../core/services/auth-state.service';
 import type { LocalListing } from '../../../core/models/local-listing';
 
-const listings: LocalListing[] = Array.from({ length: 5 }, (_, i) => ({ id: String(i), title: `Restaurant ${i}`, category: 'restaurant', image_url: `https://example.com/${i}.jpg`, address: `${i} Main St`, city: 'Austin', state: 'TX', brief_review: `Review ${i}`, is_active: true }));
+const listings: LocalListing[] = Array.from({ length: 5 }, (_, i) => ({ id: String(i), title: `Restaurant ${i}`, category: 'restaurant', image_url: `https://example.com/${i}.jpg`, address: `${i} Main St`, city: 'Austin', market_city: 'Austin', state: 'TX', brief_review: `Review ${i}`, is_active: true }));
 describe('Restaurant slider', () => {
   const api = { getApprovedReviews: vi.fn(), submitReview: vi.fn() };
   beforeEach(() => {
