@@ -1,0 +1,14 @@
+@use '../../../../styles/theme' as t;
+:host { display: block; }
+.promo { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; padding: 40px 24px; margin-top: 24px; border-radius: 24px; background: t.$warm-background; }
+.eyebrow { color: t.$primary-red; font-size: 11px; font-weight: 800; letter-spacing: 1px; }
+h2 { font-size: clamp(28px,3vw,38px); margin: 16px 0; }
+p,li { line-height: 1.7; color: t.$text-secondary; font-size: 14px; }
+ul { padding-left: 20px; } li { margin-bottom: 8px; }
+.tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.tiles a { min-height: 110px; background: white; border: 1px solid t.$border-color; border-radius: 16px; padding: 20px; display: flex; flex-direction: column; gap: 18px; color: t.$text-primary; text-decoration: none; font-weight: 700; }
+.tiles span,.more { color: t.$primary-red; } .more { display: inline-block; padding: 18px 0; font-weight: 700; }
+a:focus-visible { outline: 3px solid t.$focus-color; outline-offset: 3px; }
+.tiles a:hover { border-color: t.$primary-red; }
+@media(max-width: 800px) { .promo { grid-template-columns: 1fr; gap: 20px; } }
+@media(max-width: 400px) { .tiles { grid-template-columns: 1fr; } }

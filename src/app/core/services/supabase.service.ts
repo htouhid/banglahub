@@ -1,3 +1,4 @@
+import type { ServicePost } from '../models/service-post';
 import type { CommunityJob, CreateCommunityJob, UpdateCommunityJob } from '../models/community-job';
 import type { LocalRating } from '../models/local-rating';
 import { Injectable } from '@angular/core';
@@ -30,6 +31,14 @@ export class SupabaseService {
     environment.supabaseUrl,
     environment.supabasePublishableKey,
   );
+
+  async getServicePosts(marketCity: string): Promise<ServicePost[]> {
+    const { data, error } = await this.client.schema('public').from('service_posts')
+      .select('*').eq('market_city', marketCity).eq('status', 'active')
+      .order('created_at', { ascending: false }).returns<ServicePost[]>();
+    if (error) throw error;
+    return data ?? [];
+  }
 
   async getCommunityJobs(marketCity: string): Promise<CommunityJob[]> {
     const { data, error } = await this.client.schema('public').from('community_jobs')

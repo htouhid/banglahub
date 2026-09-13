@@ -1,0 +1,55 @@
+<section class="services-page">
+  <header><span class="eyebrow">COMMUNITY KNOW-HOW</span><h1>Services in {{ context.selectedCity().name }}</h1>
+    <p>Find trusted recommendations and lend a hand to your neighbors.</p>
+    <label>Browsing market <select [value]="context.selectedCity().key" (change)="context.selectCity($any($event.target).value)">@for (city of markets; track city.key) { <option [value]="city.key">{{ city.name }}, {{ city.state }}</option> }</select></label>
+  </header>
+  @if (loading()) { <p role="status">Loading community services…</p> }
+  @else if (error()) { <p role="alert">{{ error() }}</p><button (click)="load()" type="button">Try again</button> }
+  @else {
+    <div class="services-columns">
+    @for (section of sections(); track section.type) {
+      <section class="community-section" [attr.aria-labelledby]="'heading-' + section.type">
+        <div class="section-heading"><div><h2 [id]="'heading-' + section.type">{{ section.heading }}</h2><p>{{ section.subtitle }}</p></div>
+          @if (auth.user()) { <button type="button" disabled>{{ section.action }} — Coming soon</button> }
+          @else { <a class="primary" routerLink="/sign-in">{{ section.action }}</a> }
+        </div>
+        @if (!section.posts.length) {
+          <div class="empty"><span class="empty-mark" aria-hidden="true">+</span><h3>{{ section.empty }}</h3><p>{{ section.prompt }}</p>
+            @if (auth.user()) { <button type="button" disabled>{{ section.action }} — Coming soon</button> }
+            @else { <a class="primary" routerLink="/sign-in">{{ section.action }}</a> }
+            <p class="hint">Community posting is coming soon.</p>
+          </div>
+        } @else {
+          <div class="cards">
+            @for (post of section.posts; track post.id) {
+              <article><span class="eyebrow">{{ post.category }}</span><h3>{{ post.title }}</h3><p>{{ post.location }}</p>
+                @if (post.post_type === 'recommendation') {
+                  @if (post.provider_name) { <strong>{{ post.provider_name }}</strong> }
+                  @if (post.provider_type) { <span class="badge">{{ post.provider_type === 'business' ? 'Business' : 'Independent Provider' }}</span> }
+                  @if (post.rating !== null && post.rating > 0) { <p [attr.aria-label]="post.rating + ' out of 5 stars'"><span aria-hidden="true">@for (star of stars; track star) { {{ star <= post.rating ? '★' : '☆' }} }</span></p> }
+                  @if (post.service_cost !== null) { <p>Paid about {{ post.service_cost | currency:'USD' }}</p> }
+                  @if (post.diagnostic_fee !== null) { <p>Diagnostic fee: {{ post.diagnostic_fee | currency:'USD' }}</p> }
+                } @else {
+                  @if (post.urgency) { <span class="badge">{{ post.urgency }}</span> }
+                  @if (post.budget_min !== null || post.budget_max !== null) {
+                    <p>Budget:
+                    @if (post.budget_min !== null && post.budget_max !== null) { {{ post.budget_min | currency:'USD' }}–{{ post.budget_max | currency:'USD' }} }
+                    @else if (post.budget_min !== null) { From {{ post.budget_min | currency:'USD' }} }
+                    @else { Up to {{ post.budget_max | currency:'USD' }} }
+                    </p>
+                  }
+                }
+                <p class="excerpt">{{ post.description }}</p><time [attr.datetime]="post.created_at">{{ post.created_at | date:'M/d/yy' }}</time>
+                <details><summary>View details</summary><div class="description">{{ post.description }}</div>
+                  @if (post.pricing_notes) { <p>{{ post.pricing_notes }}</p> }
+                  @if (post.post_type === 'request') { <p class="hint">Responding to requests is coming soon.</p> }
+                </details>
+              </article>
+            }
+          </div>
+        }
+      </section>
+    }
+    </div>
+  }
+</section>

@@ -1,0 +1,10 @@
+<section class="promo" aria-labelledby="services-promo-heading">
+  <div><span class="eyebrow">GOOD PEOPLE. TRUSTED CONNECTIONS.</span>
+    <h2 id="services-promo-heading">Need a trusted service?</h2>
+    <p>Find providers recommended by your community, share someone you trust, or ask for help when you need it.</p>
+    <ul><li>Recommendations from real community members</li><li>See actual experience and pricing when shared</li><li>Ask for help and get direct referrals</li></ul>
+  </div>
+  <div><div class="tiles">@for (category of categories; track category) { <a routerLink="/services"><span aria-hidden="true">↗</span>{{ category }}</a> }</div>
+    <a class="more" routerLink="/services">More Community Services <span aria-hidden="true">→</span></a>
+  </div>
+</section>
