@@ -1,5 +1,8 @@
 <section class="jobs-page" [class.embedded]="!standalonePage()">
-  <header><div><span class="eyebrow">OPPORTUNITIES IN YOUR COMMUNITY</span>@if (standalonePage()) { <h1>Jobs in {{ context.selectedCity().name }}</h1> } @else { <h2 class="section-title">Jobs in {{ context.selectedCity().name }}</h2> }<p>Local opportunities, shared by BanglaHub members.</p></div>
+  <header><div><span class="eyebrow">OPPORTUNITIES IN YOUR COMMUNITY</span>@if (standalonePage()) { <h1>Jobs in {{ context.selectedCity().name }}</h1> } @else { <h2 class="section-title">Jobs in {{ context.selectedCity().name }}</h2> }
+    <p>Local opportunities, shared by BanglaHub members.</p>
+    <p>Jobs shared directly by our community—connecting candidates with members who can refer, recommend, and help open doors while building meaningful professional networks.</p>
+  </div>
     <a class="primary" [routerLink]="auth.user() ? '/jobs/new' : '/sign-in'" [queryParams]="auth.user() ? {} : {returnUrl: '/jobs/new'}">Post a Job</a>
   </header>
   <div class="toolbar">@if (standalonePage()) { <label>Browsing market <select [value]="context.selectedCity().key" (change)="context.selectCity($any($event.target).value)">@for (city of markets; track city.key) { <option [value]="city.key">{{ city.name }}, {{ city.state }}</option> }</select></label> } @else { <a routerLink="/jobs">View All Jobs →</a> }
