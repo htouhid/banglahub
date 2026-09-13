@@ -1,3 +1,4 @@
+import { CommunityJobsCarousel } from '../../shared/components/community-jobs-carousel/community-jobs-carousel';
 import { CityHeroSlider } from '../../shared/components/city-hero-slider/city-hero-slider';
 import { LocalWeatherComponent } from '../../shared/components/local-weather/local-weather';
 import { LocalNewsComponent } from '../../shared/components/local-news/local-news';
@@ -11,7 +12,7 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-home',
-  imports: [CityHeroSlider, LocalWeatherComponent, LocalNewsComponent, RouterLink, MatTabsModule, Restaurants, Groceries],
+  imports: [CommunityJobsCarousel, CityHeroSlider, LocalWeatherComponent, LocalNewsComponent, RouterLink, MatTabsModule, Restaurants, Groceries],
   templateUrl: './home.html',
   styleUrl: './home.scss',
 })

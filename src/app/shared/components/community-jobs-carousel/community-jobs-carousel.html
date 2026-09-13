@@ -1,0 +1,26 @@
+<section class="jobs-page" [class.embedded]="!standalonePage()">
+  <header><div><span class="eyebrow">OPPORTUNITIES IN YOUR COMMUNITY</span>@if (standalonePage()) { <h1>Jobs in {{ context.selectedCity().name }}</h1> } @else { <h2 class="section-title">Jobs in {{ context.selectedCity().name }}</h2> }<p>Local opportunities, shared by BanglaHub members.</p></div>
+    <a class="primary" [routerLink]="auth.user() ? '/jobs/new' : '/sign-in'" [queryParams]="auth.user() ? {} : {returnUrl: '/jobs/new'}">Post a Job</a>
+  </header>
+  <div class="toolbar">@if (standalonePage()) { <label>Browsing market <select [value]="context.selectedCity().key" (change)="context.selectCity($any($event.target).value)">@for (city of markets; track city.key) { <option [value]="city.key">{{ city.name }}, {{ city.state }}</option> }</select></label> } @else { <a routerLink="/jobs">View All Jobs →</a> }
+    <div><button type="button" aria-label="Previous job cards" (click)="move(-1)">←</button> <button type="button" aria-label="Next job cards" (click)="move(1)">→</button></div>
+  </div>
+  @if (loading()) { <p role="status">Loading community jobs…</p> }
+  @else if (error()) { <p role="alert">{{ error() }}</p><button type="button" (click)="load()">Try again</button> }
+  @else {
+    @if (!jobs().length) { <p>No opportunities posted here yet. Be the first to share one.</p> }
+    <div #track class="track" tabindex="0" role="region" aria-label="Community job cards">
+      @for (job of jobs(); track job.id) {
+        <article><h3>{{ job.title }}</h3><p>{{ job.location }}</p><p>{{ job.employment_type }}</p><p class="pay">{{ pay(job) }}</p>
+          <footer><div>Posted by: <a [href]="'mailto:' + job.contact_email">{{ job.contact_email }}</a></div><time [attr.datetime]="job.created_at">{{ job.created_at | date:'M/d/yy' }}</time></footer>
+          <details><summary [attr.aria-label]="'Job details for ' + job.title"><span aria-hidden="true">ⓘ</span> Details</summary>
+            <div class="details"><h4>Job Details</h4>@if (job.company_name) { <strong>{{ job.company_name }}</strong> }<p class="description">{{ job.description }}</p><p>{{ job.location }} · {{ job.employment_type }}</p><p>{{ pay(job) }}</p><a [href]="'mailto:' + job.contact_email">{{ job.contact_email }}</a></div>
+          </details>
+        </article>
+      }
+      @for (slot of slots(); track slot) {
+        <a class="post-card" [routerLink]="auth.user() ? '/jobs/new' : '/sign-in'" [queryParams]="auth.user() ? {} : {returnUrl: '/jobs/new'}"><span class="plus" aria-hidden="true">+</span><h3>Post a Job</h3><p>Know about an opportunity?<br>Share it with the BanglaHub community.</p></a>
+      }
+    </div>
+  }
+</section>

@@ -1,0 +1,23 @@
+<section class="jobs-page form-page"><a routerLink="/jobs">← Back to Jobs</a><h1>Post a Job</h1>
+@if (auth.initializing()) { <p role="status">Checking your session…</p> }
+@else if (!auth.user()) { <p>Sign in to share an opportunity.</p><a class="primary" routerLink="/sign-in" [queryParams]="{returnUrl: '/jobs/new'}">Sign in to post a job</a> }
+@else {
+<form [formGroup]="form" (ngSubmit)="submit()">
+  <fieldset [disabled]="saving()"><legend>Opportunity details</legend><div class="form-grid">
+  <label>Job Title *<input formControlName="title" required></label>
+  <label>Company / Business<input formControlName="company_name"></label>
+  <label>Location *<input formControlName="location" required></label>
+  <label>Market *<select formControlName="market_city" required>@for (city of markets; track city.key) { <option [value]="city.name">{{ city.name }}</option> }</select></label>
+  <label>Employment Type *<select formControlName="employment_type" required>@for (type of employment; track type) { <option [value]="type">{{ type }}</option> }</select></label>
+  <label>Pay Type *<select formControlName="pay_type" required>@for (type of payTypes; track type) { <option [value]="type">{{ type }}</option> }</select></label>
+  <label>Pay Minimum<input type="number" min="0" step="0.01" formControlName="pay_min"></label>
+  <label>Pay Maximum<input type="number" min="0" step="0.01" formControlName="pay_max"></label>
+  <label>Pay Text<input formControlName="pay_text" placeholder="Optional pay details"></label>
+  <label>Contact Email *<input type="email" formControlName="contact_email" required><small>This email will be public on your job post.</small></label>
+  <label class="wide">Job Description *<textarea rows="7" formControlName="description" required></textarea></label>
+  </div></fieldset>
+  @if (error()) { <p role="alert">{{ error() }}</p> }
+  <button class="primary" type="submit" [disabled]="saving()">{{ saving() ? 'Posting…' : 'Post Job' }}</button>
+</form>
+}
+</section>

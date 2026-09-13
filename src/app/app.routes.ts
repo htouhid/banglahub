@@ -47,8 +47,10 @@ export const routes: Routes = [
   { path: 'sign-up', component: SignUp, title: 'Sign Up | Bangla Hub' },
   { path: 'sign-up-success', component: SignUpSuccess, title: 'Thank you | Bangla Hub' },
   { path: 'news', loadComponent: () => import('./pages/news/news').then(m => m.News), title: 'Bangladesh News | Bangla Hub' },
+  { path: 'jobs/new', loadComponent: () => import('./pages/jobs/job-form').then(m => m.JobForm), title: 'Post a Job | Bangla Hub' },
+  { path: 'jobs', loadComponent: () => import('./pages/jobs/jobs').then(m => m.Jobs), title: 'Community Jobs | Bangla Hub' },
   { path: 'account', component: Account, title: 'My Account | Bangla Hub' },
-  ...['businesses', 'events', 'jobs', 'community', 'about', 'contact', 'privacy', 'terms'].map((path) => ({
+  ...['businesses', 'events', 'community', 'about', 'contact', 'privacy', 'terms'].map((path) => ({
     path,
     component: Placeholder,
     title: `${path[0].toUpperCase()}${path.slice(1)} | Bangla Hub`,

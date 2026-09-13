@@ -1,3 +1,4 @@
+import type { CommunityJob, CreateCommunityJob, UpdateCommunityJob } from '../models/community-job';
 import type { LocalRating } from '../models/local-rating';
 import { Injectable } from '@angular/core';
 import {
@@ -29,6 +30,39 @@ export class SupabaseService {
     environment.supabaseUrl,
     environment.supabasePublishableKey,
   );
+
+  async getCommunityJobs(marketCity: string): Promise<CommunityJob[]> {
+    const { data, error } = await this.client.schema('public').from('community_jobs')
+      .select('*').eq('is_active', true).eq('market_city', marketCity)
+      .order('created_at', { ascending: false }).returns<CommunityJob[]>();
+    if (error) throw error;
+    return data ?? [];
+  }
+  private async jobOwner(): Promise<string> {
+    const { data, error } = await this.client.auth.getUser();
+    if (error || !data.user) throw new Error('Sign in to manage jobs.');
+    return data.user.id;
+  }
+  async createCommunityJob(job: CreateCommunityJob): Promise<CommunityJob> {
+    const user_id = await this.jobOwner();
+    const { data, error } = await this.client.schema('public').from('community_jobs')
+      .insert({ ...job, user_id }).select('*').single<CommunityJob>();
+    if (error) throw error;
+    return data;
+  }
+  async updateCommunityJob(id: string, job: UpdateCommunityJob): Promise<CommunityJob> {
+    const owner = await this.jobOwner();
+    const { data, error } = await this.client.schema('public').from('community_jobs')
+      .update(job).eq('id', id).eq('user_id', owner).select('*').single<CommunityJob>();
+    if (error) throw error;
+    return data;
+  }
+  async deleteCommunityJob(id: string): Promise<void> {
+    const owner = await this.jobOwner();
+    const { error } = await this.client.schema('public').from('community_jobs').delete()
+      .eq('id', id).eq('user_id', owner);
+    if (error) throw error;
+  }
 
   onAuthStateChange(callback: (event: AuthChangeEvent, session: Session | null) => void) {
     return this.client.auth.onAuthStateChange(callback);
