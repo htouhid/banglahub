@@ -1,3 +1,4 @@
+import type { LocalRating } from '../models/local-rating';
 import { Injectable } from '@angular/core';
 import {
   createClient,
@@ -68,6 +69,35 @@ async getProfile(userId: string): Promise<UserProfile | null> {
     const { data, error } = await query.order('title').returns<LocalListing[]>();
     if (error) throw error;
     return data ?? [];
+  }
+
+  getGroceriesByMarket(marketCity: string): Promise<LocalListing[]> {
+    return this.getListingsByCategory('grocery', marketCity);
+  }
+
+  async getRatings(listingIds: string[]): Promise<LocalRating[]> {
+    if (!listingIds.length) return [];
+    const rows: LocalRating[] = [];
+    // Paginate so Supabase's row limit cannot silently truncate rating averages.
+    for (let offset = 0; ; offset += 1000) {
+      const { data, error } = await this.client.schema('public').from('local_ratings')
+        .select('id, listing_id, user_id, rating').in('listing_id', [...new Set(listingIds)])
+        .order('id').range(offset, offset + 999).returns<LocalRating[]>();
+      if (error) throw error;
+      rows.push(...(data ?? []));
+      if (!data || data.length < 1000) return rows;
+    }
+  }
+
+  async saveRating(listingId: string, rating: number): Promise<LocalRating> {
+    if (!Number.isInteger(rating) || rating < 1 || rating > 5) throw new Error('Rating must be 1–5.');
+    const { data: auth, error: authError } = await this.client.auth.getUser();
+    if (authError || !auth.user) throw new Error('Sign in to rate this store.');
+    const { data, error } = await this.client.schema('public').from('local_ratings')
+      .upsert({ listing_id: listingId, user_id: auth.user.id, rating }, { onConflict: 'listing_id,user_id' })
+      .select('id, listing_id, user_id, rating').single<LocalRating>();
+    if (error) throw error;
+    return data;
   }
 
   async getApprovedReviews(listingId: string): Promise<GuestReview[]> {

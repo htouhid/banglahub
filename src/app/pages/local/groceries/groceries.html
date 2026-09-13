@@ -1,0 +1,76 @@
+<section class="groceries" aria-labelledby="groceries-heading" [attr.aria-busy]="loading()">
+  <header>
+    <div><span class="eyebrow">BANGLAHUB · EXPLORE LOCAL</span>
+      <h2 id="groceries-heading">Groceries in {{ city().name }}</h2>
+      <p>Find the familiar flavors and essentials you love.</p>
+    </div>
+    @if (!loading() && listings().length) {
+      <div class="controls">
+        <button type="button" aria-label="Previous grocery cards" aria-controls="grocery-track" (click)="move(-1)">←</button>
+        <button type="button" aria-label="Next grocery cards" aria-controls="grocery-track" (click)="move(1)">→</button>
+      </div>
+    }
+  </header>
+  @if (loading()) {
+    <p role="status">Loading local groceries…</p>
+    <div class="skeletons" aria-hidden="true"><div></div><div></div><div></div></div>
+  } @else if (error()) {
+    <div class="state"><p role="alert">{{ error() }}</p><button type="button" (click)="load()">Try again</button></div>
+  } @else if (!listings().length) {
+    <p class="state" role="status">No grocery listings are available in {{ city().name }} yet.</p>
+  } @else {
+    <div #track id="grocery-track" class="track" tabindex="0" role="region" aria-label="Grocery stores; scroll horizontally for more">
+      @for (listing of listings(); track listing.id) {
+        <article>
+          <h3>{{ listing.title }}</h3>
+          <address>{{ listing.address }}<br>{{ listing.city }}, {{ listing.state }}</address>
+          @if (ratingsLoading()) { <p role="status">Loading ratings…</p> }
+          @else if (ratingsError()) { <p>{{ ratingsError() }}</p><button type="button" (click)="loadRatings()">Retry ratings</button> }
+          @else {
+            <p class="rating">
+              <span aria-hidden="true">@for (star of stars; track star) { {{ star <= summary(listing.id).filled ? '★' : '☆' }} }</span>
+              <span>{{ summary(listing.id).count ? summary(listing.id).average.toFixed(1) + ' • ' + summary(listing.id).count + (summary(listing.id).count === 1 ? ' rating' : ' ratings') : 'No ratings yet' }}</span>
+            </p>
+            @if (auth.user()) {
+              <p>{{ summary(listing.id).mine ? 'Your rating' : 'Rate this store' }}</p>
+              <div class="rating-buttons" role="group" [attr.aria-label]="'Rate ' + listing.title" (mouseleave)="hover.set(null)">
+                @for (star of stars; track star) {
+                  <button type="button" [attr.aria-label]="'Rate ' + star + ' out of 5'"
+                    [attr.aria-pressed]="summary(listing.id).mine === star" [disabled]="saving().has(listing.id)"
+                    (mouseenter)="hover.set({id: listing.id, value: star})"
+                    (focus)="hover.set({id: listing.id, value: star})" (blur)="hover.set(null)"
+                    (click)="rate(listing.id, star)"
+                    [class.filled]="star <= (hover()?.id === listing.id ? hover()!.value : summary(listing.id).mine)">
+                    <span aria-hidden="true">{{ star <= (hover()?.id === listing.id ? hover()!.value : summary(listing.id).mine) ? '★' : '☆' }}</span>
+                  </button>
+                }
+              </div>
+              @if (saving().has(listing.id)) { <p role="status">Saving rating…</p> }
+              @if (messages()[listing.id]) { <p role="status">{{ messages()[listing.id] }}</p> }
+              @if (failures()[listing.id]) { <p role="alert">{{ failures()[listing.id] }}</p> }
+            } @else {
+              <a routerLink="/sign-in" [queryParams]="{returnUrl: '/local/groceries'}">Sign in to rate this store</a>
+            }
+          }
+          @if (tags(listing.grocery_type).length) {
+            <ul class="tags" aria-label="Grocery types">
+              @for (tag of tags(listing.grocery_type); track tag) { <li>{{ tag }}</li> }
+            </ul>
+          }
+          @if (listing.brief_review) { <p>{{ listing.brief_review }}</p> }
+          @if (listing.products_summary) { <div class="products"><h4>What you’ll find</h4><p>{{ listing.products_summary }}</p></div> }
+          <div class="halal" [class.verified]="listing.halal_status === 'yes'">
+            <h4>
+              @switch (listing.halal_status) {
+                @case ('yes') { <span aria-hidden="true">✓</span> Halal meat available }
+                @case ('no') { Halal meat not available }
+                @default { Halal information not verified }
+              }
+            </h4>
+            @if (listing.halal_notes) { <p>{{ listing.halal_notes }}</p> }
+          </div>
+        </article>
+      }
+    </div>
+  }
+</section>

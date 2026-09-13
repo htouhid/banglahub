@@ -9,6 +9,10 @@ export interface LocalListing {
   city: string;
   market_city: string;
   state: string;
+  grocery_type?: string | null;
+  halal_status?: 'yes' | 'no' | 'unknown' | null;
+  halal_notes?: string | null;
+  products_summary?: string | null;
   brief_review: string | null;
   is_active: boolean;
   created_at?: string;
