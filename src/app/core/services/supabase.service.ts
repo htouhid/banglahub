@@ -1,3 +1,4 @@
+import type { HousingPost, HousingResponse, CreateHousingPost, UpdateHousingPost, CreateHousingResponse } from '../models/housing';
 import type { ServicePost } from '../models/service-post';
 import type { CommunityJob, CreateCommunityJob, UpdateCommunityJob } from '../models/community-job';
 import type { LocalRating } from '../models/local-rating';
@@ -31,6 +32,54 @@ export class SupabaseService {
     environment.supabaseUrl,
     environment.supabasePublishableKey,
   );
+
+  async getHousingPosts(marketCity: string): Promise<HousingPost[]> {
+    const { data, error } = await this.client.schema('public').from('housing_posts')
+      .select('*').eq('market_city', marketCity).eq('status', 'active')
+      .order('created_at', { ascending: false }).returns<HousingPost[]>();
+    if (error) throw error;
+    return data ?? [];
+  }
+  private async housingUserId(): Promise<string> {
+    const { data, error } = await this.client.auth.getUser();
+    if (error || !data.user) throw new Error('Sign in to manage housing posts.');
+    return data.user.id;
+  }
+  async createHousingPost(post: CreateHousingPost): Promise<HousingPost> {
+    const user_id = await this.housingUserId();
+    const { data, error } = await this.client.schema('public').from('housing_posts')
+      .insert({ ...post, user_id }).select('*').single<HousingPost>();
+    if (error) throw error;
+    return data;
+  }
+  async updateHousingPost(id: string, post: UpdateHousingPost): Promise<HousingPost> {
+    const owner = await this.housingUserId();
+    const { data, error } = await this.client.schema('public').from('housing_posts')
+      .update(post).eq('id', id).eq('user_id', owner).select('*').single<HousingPost>();
+    if (error) throw error;
+    return data;
+  }
+  async deleteHousingPost(id: string): Promise<void> {
+    const owner = await this.housingUserId();
+    const { error } = await this.client.schema('public').from('housing_posts')
+      .delete().eq('id', id).eq('user_id', owner);
+    if (error) throw error;
+  }
+  async getHousingResponses(postId: string): Promise<HousingResponse[]> {
+    const { data, error } = await this.client.schema('public').from('housing_responses')
+      .select('*').eq('post_id', postId).order('created_at').returns<HousingResponse[]>();
+    if (error) throw error;
+    return data ?? [];
+  }
+  async createHousingResponse(response: CreateHousingResponse): Promise<HousingResponse> {
+    const user_id = await this.housingUserId();
+    const message = response.message.trim();
+    if (!message) throw new Error('A response message is required.');
+    const { data, error } = await this.client.schema('public').from('housing_responses')
+      .insert({ post_id: response.post_id, message, user_id }).select('*').single<HousingResponse>();
+    if (error) throw error;
+    return data;
+  }
 
   async getServicePosts(marketCity: string): Promise<ServicePost[]> {
     const { data, error } = await this.client.schema('public').from('service_posts')

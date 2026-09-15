@@ -1,0 +1,63 @@
+<section class="housing-page" [class.embedded]="embedded()">
+  <header><span class="eyebrow">A PLACE TO CALL HOME</span>
+    @if (embedded()) { <h2>Housing in {{ context.selectedCity().name }}</h2> } @else { <h1>Housing in {{ context.selectedCity().name }}</h1> }
+    <p>Find homes, rentals, and housing opportunities shared within the community—or let others know what you're looking for.</p>
+    @if (embedded()) { <a routerLink="/housing">View all Housing →</a> } @else {
+      <label>Browsing market <select [value]="context.selectedCity().key" (change)="context.selectCity($any($event.target).value)">@for (city of markets; track city.key) { <option [value]="city.key">{{ city.name }}, {{ city.state }}</option> }</select></label>
+    }
+  </header>
+  @if (loading()) { <p role="status">Loading housing opportunities…</p> }
+  @else if (error()) { <p role="alert">{{ error() }}</p><button type="button" (click)="load()">Try again</button> }
+  @else {
+    <div class="housing-columns">
+    @for (section of sections(); track section.type) {
+      <section class="community-section">
+        <div class="section-heading"><div>
+          <mat-icon aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 11 12 3l9 8M5 10v11h14V10M9 21v-8h6v8"/></svg></mat-icon>
+          <h2>{{ section.heading }}</h2><p>{{ section.subtitle }}</p></div>
+          <a class="primary" [routerLink]="auth.user() ? '/housing/new/' + section.type : '/sign-in'">{{ section.action }}</a>
+        </div>
+        @if (!section.posts.length) {
+          <div class="empty"><h3>{{ section.empty }}</h3><p>{{ section.prompt }}</p>
+            <a class="primary" [routerLink]="auth.user() ? '/housing/new/' + section.type : '/sign-in'">{{ section.action }}</a>
+          </div>
+        } @else {
+          <div class="cards">
+          @for (post of section.posts; track post.id) {
+            <article><h3>{{ post.title }}</h3>
+              <p class="location"><mat-icon aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 22S4 14 4 9a8 8 0 0 1 16 0c0 5-8 13-8 13Z"/><circle cx="12" cy="9" r="3"/></svg></mat-icon>{{ post.location }}</p>
+              @if (post.property_type) { <span class="badge">{{ post.property_type }}</span> }
+              @if (post.post_type === 'listing') {
+                @if (post.listing_type) { <span class="badge">{{ post.listing_type === 'rent' ? 'Rent' : 'Sale' }}</span> }
+                @if (post.price !== null) { <p><strong>{{ post.price | currency:'USD' }}</strong>@if (post.price_period) { / {{ post.price_period }} }</p> }
+                <ul class="facts">
+                  @if (post.bedrooms !== null) { <li>{{ post.bedrooms }} bedrooms</li> }
+                  @if (post.bathrooms !== null) { <li>{{ post.bathrooms }} bathrooms</li> }
+                  @if (post.square_feet !== null) { <li>{{ post.square_feet }} sq ft</li> }
+                </ul>
+                @if (post.available_date) { <p>Available {{ post.available_date | date:'M/d/yy':'UTC' }}</p> }
+                @if (post.posted_by_type) { <p>Posted by: <span class="badge">{{ post.posted_by_type }}</span></p> }
+              } @else {
+                @if (post.budget_min !== null && post.budget_max !== null) { <p>Budget: {{ post.budget_min | currency:'USD' }}–{{ post.budget_max | currency:'USD' }}</p> }
+                @else if (post.budget_min !== null) { <p>Budget from {{ post.budget_min | currency:'USD' }}</p> }
+                @else if (post.budget_max !== null) { <p>Budget up to {{ post.budget_max | currency:'USD' }}</p> }
+                @if (post.needed_by) { <p>Needed by {{ post.needed_by | date:'M/d/yy':'UTC' }}</p> }
+              }
+              <p class="excerpt">{{ post.description }}</p><time [attr.datetime]="post.created_at">{{ post.created_at | date:'M/d/yy' }}</time>
+              <details><summary>View details</summary><div class="description">{{ post.description }}</div>
+                @if (post.is_furnished !== null) { <p>{{ post.is_furnished ? 'Furnished' : 'Unfurnished' }}</p> }
+                @if (post.utilities_included !== null) { <p>{{ post.utilities_included ? 'Utilities included' : 'Utilities not included' }}</p> }
+                @if (post.pets_allowed !== null) { <p>{{ post.pets_allowed ? 'Pets allowed' : 'Pets not allowed' }}</p> }
+                @if (post.contact_email) { <p><a [href]="'mailto:' + post.contact_email">{{ post.contact_email }}</a></p> }
+                @if (post.contact_phone) { <p>{{ post.contact_phone }}</p> }
+                @if (post.post_type === 'wanted') { <p class="hint">Community responses are coming in the next phase.</p> }
+              </details>
+            </article>
+          }
+          </div>
+        }
+      </section>
+    }
+    </div>
+  }
+</section>

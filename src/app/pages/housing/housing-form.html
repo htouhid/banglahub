@@ -1,0 +1,42 @@
+<section class="housing-form">
+  <a routerLink="/housing">← Back to Housing</a>
+  <h1><mat-icon aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 11 12 3l9 8M5 10v11h14V10M9 21v-8h6v8"/></svg></mat-icon>{{ listing ? 'Post a Property' : 'Post Housing Need' }}</h1>
+  @if (auth.initializing() || !auth.user()) { <p role="status">Checking your session…</p> }
+  @else {
+    <p>Fields marked * are required. Contact details you provide will be public.</p>
+    <form [formGroup]="form" (ngSubmit)="submit()">
+      <fieldset [disabled]="saving()"><legend>{{ listing ? 'Property details' : 'What you’re looking for' }}</legend>
+        <div class="fields">
+          <label class="wide">Title *<input formControlName="title" required></label>
+          @if (listing) {
+            <label>Listing Type *<select formControlName="listing_type" required><option [ngValue]="null">Select type</option><option value="rent">Rent</option><option value="sale">Sale</option></select></label>
+            <label>Posted By *<select formControlName="posted_by_type" required><option [ngValue]="null">Select role</option>@for (owner of owners; track owner) { <option [value]="owner">{{ owner }}</option> }</select></label>
+          }
+          <label>Property Type {{ listing ? '*' : '' }}<select formControlName="property_type" [required]="listing"><option [ngValue]="null">Select property type</option>@for (property of properties; track property) { <option [value]="property">{{ property }}</option> }</select></label>
+          <label>{{ listing ? 'Location' : 'Preferred Location' }} *<input formControlName="location" required></label>
+          <label>Market *<select formControlName="market_city" required>@for (city of markets; track city.key) { <option [value]="city.name">{{ city.name }}</option> }</select></label>
+          @if (listing) {
+            <label>Price<input type="number" min="0" step="0.01" formControlName="price"></label>
+            <label>Price Period<select formControlName="price_period"><option value="">Not specified</option>@for (period of periods; track period) { <option [value]="period">{{ period }}</option> }</select></label>
+            <label>Bedrooms<input type="number" min="0" step="any" formControlName="bedrooms"></label>
+            <label>Bathrooms<input type="number" min="0" step="any" formControlName="bathrooms"></label>
+            <label>Square Feet<input type="number" min="0" step="1" formControlName="square_feet"></label>
+            <label>Available Date<input type="date" formControlName="available_date"></label>
+            <label>Furnished<select formControlName="is_furnished"><option [ngValue]="null">Not specified</option><option [ngValue]="true">Yes</option><option [ngValue]="false">No</option></select></label>
+            <label>Utilities Included<select formControlName="utilities_included"><option [ngValue]="null">Not specified</option><option [ngValue]="true">Yes</option><option [ngValue]="false">No</option></select></label>
+            <label>Pets Allowed<select formControlName="pets_allowed"><option [ngValue]="null">Not specified</option><option [ngValue]="true">Yes</option><option [ngValue]="false">No</option></select></label>
+          } @else {
+            <label>Budget Minimum<input type="number" min="0" step="0.01" formControlName="budget_min"></label>
+            <label>Budget Maximum<input type="number" min="0" step="0.01" formControlName="budget_max"></label>
+            <label>Needed By<input type="date" formControlName="needed_by"></label>
+          }
+          <label>Contact Email<input type="email" formControlName="contact_email"></label>
+          <label>Contact Phone<input type="tel" formControlName="contact_phone"></label>
+          <label class="wide">Description *<textarea rows="7" formControlName="description" required></textarea></label>
+        </div>
+      </fieldset>
+      @if (error()) { <p role="alert">{{ error() }}</p> }
+      <button type="submit" [disabled]="saving()">{{ saving() ? 'Publishing…' : 'Publish Post' }}</button>
+    </form>
+  }
+</section>
