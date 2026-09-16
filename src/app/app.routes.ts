@@ -13,11 +13,15 @@ export const routes: Routes = [
 {
   path: 'admin',
   canActivate: [adminGuard],
+  canActivateChild: [adminGuard],
   children: [
+    { path: 'events', loadComponent: () => import('./admin/admin-events/admin-events').then(m => m.AdminEvents) },
+    { path: 'events/new', loadComponent: () => import('./admin/admin-events/admin-event-form').then(m => m.AdminEventForm) },
+    { path: 'events/:id/edit', loadComponent: () => import('./admin/admin-events/admin-event-form').then(m => m.AdminEventForm) },
     {
       path: '',
       pathMatch: 'full',
-      redirectTo: 'listings'
+      loadComponent: () => import('./admin/admin-dashboard/admin-dashboard').then(m => m.AdminDashboard)
     },
     {
       path: 'listings',

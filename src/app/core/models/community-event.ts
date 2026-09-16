@@ -48,3 +48,5 @@ export function eventTime(value: string | null): string {
   if (!Number.isFinite(hour) || !Number.isFinite(minute)) return '';
   return (hour % 12 || 12) + ':' + String(minute).padStart(2, '0') + (hour < 12 ? ' AM' : ' PM');
 }
+
+export type CommunityEventInput = Omit<CommunityEvent, 'id' | 'user_id' | 'created_at' | 'updated_at'>;

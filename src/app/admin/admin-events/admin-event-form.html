@@ -1,0 +1,104 @@
+<section class="admin-page form-page"><nav aria-label="Admin breadcrumb"><a routerLink="/admin">Admin Portal</a> / <a routerLink="/admin/events">Events</a></nav><h1>{{id ? "Edit Event" : "Add Event"}}</h1>
+@if(loading()){<p role="status">Loading event…</p>}
+@if(error()){<p role="alert">{{error()}}</p>}
+@if(!loading() && found()){<form [formGroup]="form" (ngSubmit)="save()">
+<fieldset [disabled]="saving()"><legend>Event Information</legend><div class="fields">
+<div class="field"><label for="title">Title *</label>
+<input id="title" formControlName="title" required type="text">
+@if(invalid("title")){<small class="error">Title is required.</small>}
+</div>
+<div class="field"><label for="short_description">Short Description</label>
+<input id="short_description" formControlName="short_description" type="text">
+@if(invalid("short_description")){<small class="error">Short Description is required.</small>}
+</div>
+<div class="field"><label for="description">Description</label>
+<textarea id="description" formControlName="description" rows="4"></textarea>
+@if(invalid("description")){<small class="error">Description is required.</small>}
+</div>
+<div class="field"><label for="category">Category *</label>
+<select id="category" formControlName="category" required><option value="">Not specified</option>@for(category of categories();track category){<option [value]="category">{{category}}</option>}</select>
+@if(invalid("category")){<small class="error">Category is required.</small>}
+</div>
+</div></fieldset>
+<fieldset [disabled]="saving()"><legend>Location</legend><div class="fields">
+<div class="field"><label for="market_city">Market City *</label>
+<select id="market_city" formControlName="market_city" required><option value="">Not specified</option>@for(market of markets;track market.key){<option [value]="market.name">{{market.name}}</option>}</select>
+@if(invalid("market_city")){<small class="error">Market City is required.</small>}
+</div>
+<div class="field"><label for="city">Physical City *</label>
+<input id="city" formControlName="city" required type="text">
+@if(invalid("city")){<small class="error">Physical City is required.</small>}
+</div>
+<div class="field"><label for="state">State *</label>
+<input id="state" formControlName="state" required type="text">
+@if(invalid("state")){<small class="error">State is required.</small>}
+</div>
+<div class="field"><label for="venue_name">Venue Name</label>
+<input id="venue_name" formControlName="venue_name" type="text">
+@if(invalid("venue_name")){<small class="error">Venue Name is required.</small>}
+</div>
+<div class="field"><label for="address">Address</label>
+<input id="address" formControlName="address" type="text">
+@if(invalid("address")){<small class="error">Address is required.</small>}
+</div>
+</div></fieldset>
+<fieldset [disabled]="saving()"><legend>Date & Time</legend><div class="fields">
+<div class="field"><label for="start_date">Start Date *</label>
+<input id="start_date" formControlName="start_date" required type="date">
+@if(invalid("start_date")){<small class="error">Start Date is required.</small>}
+</div>
+<div class="field"><label for="start_time">Start Time</label>
+<input id="start_time" formControlName="start_time" type="time" step="1">
+@if(invalid("start_time")){<small class="error">Start Time is required.</small>}
+</div>
+<div class="field"><label for="end_date">End Date</label>
+<input id="end_date" formControlName="end_date" type="date">
+@if(invalid("end_date")){<small class="error">End Date is required.</small>}
+</div>
+<div class="field"><label for="end_time">End Time</label>
+<input id="end_time" formControlName="end_time" type="time" step="1">
+@if(invalid("end_time")){<small class="error">End Time is required.</small>}
+</div>
+</div></fieldset>
+<fieldset [disabled]="saving()"><legend>Event Image</legend><div class="fields">
+<div class="field"><label for="image_url">Image Path / URL</label>
+<input id="image_url" formControlName="image_url" type="text" placeholder="/images/events/dallas/2026-state-fair-of-texas.jpg">
+@if(invalid("image_url")){<small class="error">Image Path / URL is required.</small>}
+<small>For local event images, save the image under public/images/events/&#123;city&#125;/ and enter its site-relative path here.</small>@if(form.controls.image_url.value.trim();as path){@if(failedImage()!==path){<img class="preview" [src]="path" alt="Event image preview" (error)="failedImage.set(path)">}@else{<p>Image preview unavailable.</p>}}
+</div>
+</div></fieldset>
+<fieldset [disabled]="saving()"><legend>Organizer & Links</legend><div class="fields">
+<div class="field"><label for="organizer_name">Organizer Name</label>
+<input id="organizer_name" formControlName="organizer_name" type="text">
+@if(invalid("organizer_name")){<small class="error">Organizer Name is required.</small>}
+</div>
+<div class="field"><label for="event_url">Event Website URL</label>
+<input id="event_url" formControlName="event_url" type="url">
+@if(invalid("event_url")){<small class="error">Enter a valid http:// or https:// URL, or leave blank.</small>}
+</div>
+<div class="field"><label for="ticket_url">Ticket URL</label>
+<input id="ticket_url" formControlName="ticket_url" type="url">
+@if(invalid("ticket_url")){<small class="error">Enter a valid http:// or https:// URL, or leave blank.</small>}
+</div>
+</div></fieldset>
+<fieldset [disabled]="saving()"><legend>Admission</legend><div class="fields">
+<div class="field"><label for="admission_type">Admission Type</label>
+<select id="admission_type" formControlName="admission_type"><option value="">Not specified</option><option value="unknown">Unknown</option><option value="free">Free</option><option value="paid">Paid</option><option value="donation">Donation</option></select>
+@if(invalid("admission_type")){<small class="error">Admission Type is required.</small>}
+</div>
+<div class="field"><label for="admission_details">Admission Details</label>
+<textarea id="admission_details" formControlName="admission_details" rows="4"></textarea>
+@if(invalid("admission_details")){<small class="error">Admission Details is required.</small>}
+</div>
+</div></fieldset>
+<fieldset [disabled]="saving()"><legend>Source</legend><div class="fields">
+<div class="field"><label for="source_type">Source Type</label>
+<select id="source_type" formControlName="source_type"><option value="">Not specified</option><option value="admin">Admin</option><option value="official">Official</option><option value="community">Community</option></select>
+@if(invalid("source_type")){<small class="error">Source Type is required.</small>}
+</div>
+<div class="field"><label for="source_name">Source Name</label>
+<input id="source_name" formControlName="source_name" type="text">
+@if(invalid("source_name")){<small class="error">Source Name is required.</small>}
+</div>
+</div></fieldset>
+<fieldset [disabled]="saving()"><legend>Options</legend><label class="check"><input type="checkbox" formControlName="is_featured"> Featured Event</label><label class="check"><input type="checkbox" formControlName="is_active"> Active Event</label></fieldset><div class="actions"><button class="primary" type="submit" [disabled]="saving()">{{saving() ? "Saving…" : id ? "Update Event" : "Save Event"}}</button><a routerLink="/admin/events">Cancel</a></div></form>}</section>

@@ -1,1 +1,18 @@
-<p>admin-dashboard works!</p>
+<section class="dashboard" aria-labelledby="admin-heading">
+  <header><span class="eyebrow">CONTENT & COMMUNITY</span><h1 id="admin-heading">BanglaHub Admin Portal</h1><p>Manage BanglaHub content and community information.</p></header>
+  <div class="management-grid">
+    <article>
+      <mat-icon aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 10h18l-2-7H5l-2 7Zm2 0v11h14V10M9 21v-7h6v7"/></svg></mat-icon>
+      <h2>Local Listings</h2><p>Manage restaurant and grocery listings across BanglaHub markets.</p>
+      <a routerLink="/admin/listings">Manage Listings <span aria-hidden="true">→</span></a>
+    </article>
+    <article>
+      <mat-icon aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 5h16v16H4zM8 2v6m8-6v6M4 10h16M8 14h3m2 0h3m-8 3h3"/></svg></mat-icon>
+      <h2>Events</h2><p>Add, update, organize, and manage community events.</p>
+      <a routerLink="/admin/events">Manage Events <span aria-hidden="true">→</span></a>
+    </article>
+    @for (area of futureAreas; track area) {
+      <article class="coming-soon"><h2>{{ area }}</h2><p>{{ area }} management will be available in a future update.</p><span class="badge">Coming Soon</span></article>
+    }
+  </div>
+</section>

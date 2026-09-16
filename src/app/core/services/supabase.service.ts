@@ -1,4 +1,4 @@
-import { type CommunityEvent, eventToday } from '../models/community-event';
+import { type CommunityEvent, type CommunityEventInput, eventToday } from '../models/community-event';
 import type { HousingPost, HousingResponse, CreateHousingPost, UpdateHousingPost, CreateHousingResponse } from '../models/housing';
 import type { ServicePost } from '../models/service-post';
 import type { CommunityJob, CreateCommunityJob, UpdateCommunityJob } from '../models/community-job';
@@ -33,6 +33,38 @@ export class SupabaseService {
     environment.supabaseUrl,
     environment.supabasePublishableKey,
   );
+
+  async getAdminEvents(marketCity?: string): Promise<CommunityEvent[]> {
+    let query = this.client.schema('public').from('community_events').select('*');
+    if (marketCity) query = query.eq('market_city', marketCity);
+    const { data, error } = await query.order('start_date').order('start_time').returns<CommunityEvent[]>();
+    if (error) throw error;
+    return data ?? [];
+  }
+  async getAdminEventById(id: string): Promise<CommunityEvent | null> {
+    const { data, error } = await this.client.schema('public').from('community_events')
+      .select('*').eq('id', id).maybeSingle<CommunityEvent>();
+    if (error) throw error;
+    return data;
+  }
+  async createCommunityEvent(event: CommunityEventInput): Promise<CommunityEvent> {
+    const { data: auth, error: authError } = await this.client.auth.getUser();
+    if (authError || !auth.user) throw new Error('Sign in to manage events.');
+    const { data, error } = await this.client.schema('public').from('community_events')
+      .insert({ ...event, user_id: auth.user.id }).select('*').single<CommunityEvent>();
+    if (error) throw error;
+    return data;
+  }
+  async updateCommunityEvent(id: string, event: Partial<CommunityEventInput>): Promise<CommunityEvent> {
+    const { data, error } = await this.client.schema('public').from('community_events')
+      .update(event).eq('id', id).select('*').single<CommunityEvent>();
+    if (error) throw error;
+    return data;
+  }
+  async deleteCommunityEvent(id: string): Promise<void> {
+    const { error } = await this.client.schema('public').from('community_events').delete().eq('id', id);
+    if (error) throw error;
+  }
 
   async getCommunityEvents(marketCity: string): Promise<CommunityEvent[]> {
     const today = eventToday(marketCity);
