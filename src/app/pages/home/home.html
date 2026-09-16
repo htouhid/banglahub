@@ -31,6 +31,7 @@
               @case (2) { <app-services-promo /> }
               @case (4) { <app-community-jobs-carousel /> }
               @case (5) { <app-housing [embedded]="true" /> }
+              @case (3) { <app-events [embedded]="true" /> }
               @default { <section class="category-placeholder"><h2>{{ category.title }}</h2><p>Coming soon</p><p>More ways to connect with your local Bangla community are on the way.</p></section> }
             }
           }

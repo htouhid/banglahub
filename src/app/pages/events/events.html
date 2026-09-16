@@ -1,0 +1,17 @@
+<section class="events-page" [class.embedded]="embedded()">
+<header><span class="eyebrow">GATHER. CELEBRATE. CONNECT.</span>
+@if (embedded()) { <div class="home-heading"><h2>Events in {{ context.selectedCity().name }}</h2><a routerLink="/events">View All Events →</a></div><p>Discover community gatherings, cultural celebrations, concerts, festivals, and more happening around you.</p> }
+@else { <h1>Events in {{ context.selectedCity().name }}</h1><p>Discover what's happening around you—from community gatherings and cultural celebrations to concerts, festivals, family activities, and more.</p>
+<label>Browsing market<select [value]="context.selectedCity().key" (change)="context.selectCity($any($event.target).value)">@for(city of markets;track city.key){<option [value]="city.key">{{city.name}}, {{city.state}}</option>}</select></label>
+<div class="filters" role="group" aria-label="Filter events by category">@for(item of categories;track item){<button type="button" [attr.aria-pressed]="category() === item" (click)="category.set(item)">{{item}}</button>}</div>
+}
+</header>
+@if(loading()){<p role="status">Loading upcoming events…</p>}
+@else if(error()){<p role="alert">{{error()}}</p><button type="button" (click)="load()">Try again</button>}
+@else {
+<div class="event-grid" [class.carousel]="embedded()" [attr.tabindex]="embedded() ? 0 : null" [attr.role]="embedded() ? 'region' : null" aria-label="Upcoming events">
+@for(event of visible();track event.id){<app-event-card [event]="event"/>}
+@empty{<p class="empty" role="status">No upcoming events in {{context.selectedCity().name}}{{category() === 'All' ? '' : ' for this category'}} yet. Check back soon.</p>}
+</div>
+}
+</section>

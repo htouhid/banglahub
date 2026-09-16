@@ -1,0 +1,30 @@
+@use '../../../styles/theme' as t;
+:host{display:block;min-width:0}
+.detail{box-sizing:border-box;width:100%;max-width:1200px;margin:0 auto;padding:40px 32px 64px;color:t.$text-primary}
+.back{display:inline-block;padding:10px 0;color:t.$primary-red;font-weight:600}
+h1{font-size:clamp(30px,3.5vw,46px);line-height:1.15;letter-spacing:-1px;margin:22px 0 32px;overflow-wrap:anywhere}
+.detail-grid{display:grid;grid-template-columns:minmax(0,1.65fr) minmax(0,1fr);gap:32px;align-items:start}
+.artwork, .information{min-width:0}
+app-event-visual{border-radius:24px;overflow:hidden;aspect-ratio:3/2}
+.eyebrow{color:t.$primary-red;font-size:12px;font-weight:700;text-transform:capitalize}
+.featured{display:inline-block;margin-left:10px;padding:4px 9px;border-radius:16px;background:t.$warm-background;color:t.$text-secondary;font-size:11px}
+.information{padding:26px;border:1px solid t.$border-color;border-radius:20px;background:white;box-shadow:0 8px 28px #30251908}
+.info-row{display:flex;align-items:start;gap:12px;margin-bottom:24px}
+.info-row:last-child{margin-bottom:0}.info-row>div{min-width:0}
+.info-row h2,.provenance h2{font-size:11px;text-transform:uppercase;letter-spacing:1px;color:t.$text-secondary;margin:2px 0 9px}
+p{font-size:15px;line-height:1.7;overflow-wrap:anywhere}
+.info-row p{margin:3px 0}.venue{font-weight:600}.admission{text-transform:capitalize}
+small{color:t.$text-secondary;font-size:12px}
+mat-icon{color:t.$primary-red;flex-shrink:0}
+svg{width:100%;height:100%;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linejoin:round}
+.actions{display:flex;flex-direction:column;gap:10px;border-top:1px solid t.$border-color;padding-top:20px}
+.actions a{display:flex;justify-content:space-between;align-items:center;gap:10px;min-height:44px;box-sizing:border-box;padding:13px 16px;background:t.$primary-red;color:white;text-decoration:none;border-radius:10px;font-weight:600;font-size:14px}
+.actions a:hover{background:t.$primary-red-hover}
+:where(a,button):focus-visible{outline:3px solid t.$focus-color;outline-offset:4px}
+.about{margin-top:40px;max-width:75ch}.about h2{font-size:26px}
+.description{white-space:pre-wrap;line-height:1.85;color:t.$text-secondary}
+.provenance{display:flex;flex-wrap:wrap;gap:24px 48px;margin-top:36px;border-top:1px solid t.$border-color;padding-top:28px}
+.provenance p{margin:6px 0}.disclaimer{flex-basis:100%;max-width:85ch;font-size:13px;color:t.$text-secondary}
+button{min-height:44px;padding:10px 18px;border:1px solid t.$border-color;background:white;border-radius:10px;cursor:pointer}
+@media(max-width:850px){.detail-grid{grid-template-columns:1fr;gap:20px}.detail{padding:28px 24px 48px}app-event-visual{aspect-ratio:16/9}.about{margin-top:32px}}
+@media(max-width:480px){.detail{padding-inline:20px}.information{padding:22px}h1{letter-spacing:-.5px}app-event-visual{aspect-ratio:3/2}}

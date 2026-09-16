@@ -50,11 +50,13 @@ export const routes: Routes = [
   { path: 'housing/new/listing', data: { postType: 'listing' }, loadComponent: () => import('./pages/housing/housing-form').then(m => m.HousingForm), title: 'Post a Property | Bangla Hub' },
   { path: 'housing/new/wanted', data: { postType: 'wanted' }, loadComponent: () => import('./pages/housing/housing-form').then(m => m.HousingForm), title: 'Post Housing Need | Bangla Hub' },
   { path: 'housing', loadComponent: () => import('./pages/housing/housing').then(m => m.Housing), title: 'Housing | Bangla Hub' },
+  { path: 'events', loadComponent: () => import('./pages/events/events').then(m => m.Events), title: 'Events | Bangla Hub' },
+  { path: 'events/:id', loadComponent: () => import('./pages/events/event-detail').then(m => m.EventDetail), title: 'Event Details | Bangla Hub' },
   { path: 'services', loadComponent: () => import('./pages/services/services').then(m => m.Services), title: 'Community Services | Bangla Hub' },
   { path: 'jobs/new', loadComponent: () => import('./pages/jobs/job-form').then(m => m.JobForm), title: 'Post a Job | Bangla Hub' },
   { path: 'jobs', loadComponent: () => import('./pages/jobs/jobs').then(m => m.Jobs), title: 'Community Jobs | Bangla Hub' },
   { path: 'account', component: Account, title: 'My Account | Bangla Hub' },
-  ...['businesses', 'events', 'community', 'about', 'contact', 'privacy', 'terms'].map((path) => ({
+  ...['businesses', 'community', 'about', 'contact', 'privacy', 'terms'].map((path) => ({
     path,
     component: Placeholder,
     title: `${path[0].toUpperCase()}${path.slice(1)} | Bangla Hub`,

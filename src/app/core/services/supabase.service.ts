@@ -1,3 +1,4 @@
+import { type CommunityEvent, eventToday } from '../models/community-event';
 import type { HousingPost, HousingResponse, CreateHousingPost, UpdateHousingPost, CreateHousingResponse } from '../models/housing';
 import type { ServicePost } from '../models/service-post';
 import type { CommunityJob, CreateCommunityJob, UpdateCommunityJob } from '../models/community-job';
@@ -32,6 +33,23 @@ export class SupabaseService {
     environment.supabaseUrl,
     environment.supabasePublishableKey,
   );
+
+  async getCommunityEvents(marketCity: string): Promise<CommunityEvent[]> {
+    const today = eventToday(marketCity);
+    const { data, error } = await this.client.schema('public').from('community_events')
+      .select('*').eq('is_active', true).eq('market_city', marketCity)
+      .or(`end_date.gte.${today},and(end_date.is.null,start_date.gte.${today})`)
+      .order('start_date', {ascending: true}).order('start_time', {ascending: true, nullsFirst: false})
+      .returns<CommunityEvent[]>();
+    if (error) throw error;
+    return data ?? [];
+  }
+  async getCommunityEvent(id: string): Promise<CommunityEvent | null> {
+    const { data, error } = await this.client.schema('public').from('community_events')
+      .select('*').eq('id', id).eq('is_active', true).maybeSingle<CommunityEvent>();
+    if (error) throw error;
+    return data;
+  }
 
   async getHousingPosts(marketCity: string): Promise<HousingPost[]> {
     const { data, error } = await this.client.schema('public').from('housing_posts')

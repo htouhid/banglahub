@@ -1,0 +1,21 @@
+@use '../../../styles/theme' as t;
+:host{display:block;min-width:0}
+.events-page{max-width:1280px;margin:auto;padding:48px 24px;color:t.$text-primary}
+.events-page.embedded{max-width:none;padding:32px 0}
+h1{font-size:clamp(30px,4vw,46px)}h2{font-size:clamp(26px,3vw,36px)}
+header{margin-bottom:28px}p{color:t.$text-secondary;line-height:1.65}
+.eyebrow{color:t.$primary-red;font-size:11px;font-weight:800;letter-spacing:1px}
+a{color:t.$primary-red}label{display:flex;flex-direction:column;gap:8px;max-width:260px}
+button,select{min-height:44px;padding:10px 16px;border:1px solid t.$border-color;border-radius:12px;background:white;font:inherit}
+button{cursor:pointer}button[aria-pressed=true]{background:t.$primary-red;color:white}
+.filters{display:flex;flex-wrap:wrap;gap:8px;margin-top:24px}
+:where(a,button,select,.carousel):focus-visible{outline:3px solid t.$focus-color;outline-offset:3px}
+.event-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:22px}
+.carousel{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;padding:4px 4px 24px}
+.carousel app-event-card{flex:0 0 calc((100% - 44px)/3);scroll-snap-align:start}
+.empty{padding:36px;border-radius:18px;background:t.$warm-background;grid-column:1/-1}
+@media(min-width:1400px){.carousel app-event-card{flex-basis:calc((100% - 66px)/4)}}
+@media(max-width:1000px){.event-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.carousel app-event-card{flex-basis:calc((100% - 22px)/2)}}
+@media(max-width:600px){.event-grid{grid-template-columns:1fr}.carousel app-event-card{flex-basis:90%}}
+
+.home-heading{display:flex;justify-content:space-between;align-items:center;gap:24px}.home-heading a{flex-shrink:0;padding:12px 0;font-weight:700}.home-heading h2{margin:16px 0}@media(max-width:600px){.home-heading{display:block}}

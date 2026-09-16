@@ -1,0 +1,29 @@
+<section class="events-page detail"><a class="back" routerLink="/events">← All Events</a>
+@if(loading()){<p role="status">Loading event…</p>}
+@else if(error()){<p role="alert">{{error()}}</p><button type="button" (click)="load()">Try again</button>}
+@else if(event();as item){
+<h1>{{item.title}}</h1>
+<div class="detail-grid">
+  <div class="artwork"><app-event-visual [event]="item" [hero]="true"/><p class="eyebrow">{{item.category}} @if(item.is_featured){<span class="featured">Featured</span>}</p></div>
+  <aside class="information" aria-label="Event information">
+    <div class="info-row"><mat-icon aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 5h16v16H4zM8 2v6m8-6v6M4 10h16"/></svg></mat-icon><div><h2>Date</h2>
+    <p><time [attr.datetime]="item.start_date">{{item.start_date|date:'MMM d, y':'UTC'}}</time>@if(item.end_date && item.end_date !== item.start_date){ – {{item.end_date|date:'MMM d, y':'UTC'}}}</p></div></div>
+    @if(item.start_time || item.end_time){<div class="info-row"><mat-icon aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 6v6l4 3"/></svg></mat-icon><div><h2>Time</h2><p>@if(item.start_time){ {{time(item.start_time)}} }@if(item.end_time){ {{item.start_time ? '–' : 'Until'}} {{time(item.end_time)}} }</p><small>Venue local time</small></div></div>}
+    <div class="info-row"><mat-icon aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 22S4 14 4 9a8 8 0 0 1 16 0c0 5-8 13-8 13Z"/><circle cx="12" cy="9" r="3"/></svg></mat-icon><div><h2>Location</h2>
+    @if(item.venue_name){<p class="venue">{{item.venue_name}}</p>}@if(item.address){<p>{{item.address}}</p>}<p>{{item.city}}, {{item.state}}</p></div></div>
+    @if(item.admission_type || item.admission_details){<div class="info-row"><mat-icon aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 5h18v5a2 2 0 0 0 0 4v5H3v-5a2 2 0 0 0 0-4V5Zm12 0v14"/></svg></mat-icon><div><h2>Admission</h2>@if(item.admission_type){<p class="admission">{{item.admission_type}}</p>}@if(item.admission_details){<p>{{item.admission_details}}</p>}</div></div>}
+    @if(url(item.event_url) || url(item.ticket_url)){
+    <div class="actions">
+    @if(url(item.event_url);as link){<a [href]="link" target="_blank" rel="noopener noreferrer" aria-label="Visit Event Website (opens in a new tab)">Visit Event Website <span aria-hidden="true">↗</span></a>}
+    @if(url(item.ticket_url);as link){<a [href]="link" target="_blank" rel="noopener noreferrer" aria-label="Get Tickets (opens in a new tab)">Get Tickets <span aria-hidden="true">↗</span></a>}
+    </div>}
+  </aside>
+</div>
+@if(item.description || item.short_description){<section class="about"><h2>About This Event</h2><p class="description">{{item.description || item.short_description}}</p></section>}
+<section class="provenance" aria-label="Organizer and source">
+@if(item.organizer_name){<div><h2>Organizer</h2><p>{{item.organizer_name}}</p></div>}
+@if(item.source_name || item.source_type){<div><h2>Event information provided by</h2>@if(item.source_name){<p>{{item.source_name}}</p>}@if(item.source_type){<small>{{item.source_type.toLowerCase() === 'official' ? 'Official source' : item.source_type}}</small>}</div>}
+<p class="disclaimer">BanglaHub shares event information and is not necessarily the event organizer. Confirm schedules and admission details with the organizer.</p>
+</section>
+}@else{<h1>Event not found</h1><p>This event may no longer be available.</p>}
+</section>
