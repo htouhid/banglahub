@@ -11,7 +11,10 @@ import { join } from 'node:path';
 const browserDistFolder = join(import.meta.dirname, '../browser');
 
 const app = express();
-const angularApp = new AngularNodeAppEngine();
+// Allow this deployment's exact preview hostname without using it for canonicals.
+const angularApp = new AngularNodeAppEngine({
+  allowedHosts: process.env['VERCEL_URL'] ? [process.env['VERCEL_URL']] : [],
+});
 
 app.get('/api/news', newsHandler);
 
