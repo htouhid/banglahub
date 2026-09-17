@@ -1,0 +1,15 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist/banglahub/browser",
+  "functions": {
+    "api/ssr.mjs": {
+      "includeFiles": "dist/banglahub/server/**"
+    }
+  },
+  "routes": [
+    { "src": "/", "dest": "/api/ssr" },
+    { "handle": "filesystem" },
+    { "src": "/(.*)", "dest": "/api/ssr" }
+  ]
+}

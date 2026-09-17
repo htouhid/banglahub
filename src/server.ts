@@ -47,7 +47,22 @@ app.use(
 app.use((req, res, next) => {
   angularApp
     .handle(req)
-    .then((response) => (response ? writeResponseToNodeResponse(response, res) : next()))
+    .then(async (response) => {
+      if (!response) return next();
+      // Admin intentionally uses CSR. Apply noindex to its raw shell as well as
+      // the prerendered auth pages, without making the public shell noindex.
+      if (/^\/(?:admin|account|sign-in|sign-up)(?:\/|$)/.test(req.path) &&
+          response.headers.get('content-type')?.includes('text/html')) {
+        const html = (await response.text())
+          .replace(/<meta\b[^>]*\bname=["']robots["'][^>]*>/gi, '')
+          .replace('</head>', '<meta name="robots" content="noindex, nofollow"></head>');
+        const headers = new Headers(response.headers);
+        headers.delete('content-length');
+        headers.set('X-Robots-Tag', 'noindex, nofollow');
+        response = new Response(html, { status: response.status, headers });
+      }
+      return writeResponseToNodeResponse(response, res);
+    })
     .catch(next);
 });
 
