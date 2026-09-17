@@ -5,7 +5,13 @@ import { JSDOM } from 'jsdom';
 const origin = process.env['SSR_TEST_ORIGIN'] || 'http://localhost:4000';
 const paths = ['/', '/events', '/jobs', '/housing', '/services', '/sign-in', '/sign-up', '/account', '/admin', '/admin/events'];
 for (const path of paths) {
-  const response = await fetch(origin + path);
+  const response = await fetch(origin + path, {
+    headers: process.env['SSR_TEST_PROXY_HEADERS'] === '1' ? {
+      'x-forwarded-for': '192.0.2.1',
+      'x-forwarded-host': 'bangla-hub.com',
+      'x-forwarded-proto': 'https',
+    } : {},
+  });
   assert.equal(response.status, 200, path);
   const html = await response.text();
   const doc = new JSDOM(html).window.document;

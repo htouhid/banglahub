@@ -13,6 +13,9 @@ const browserDistFolder = join(import.meta.dirname, '../browser');
 const app = express();
 // Allow this deployment's exact preview hostname without using it for canonicals.
 const angularApp = new AngularNodeAppEngine({
+  // Vercel supplies x-forwarded-for. Without explicit trust Angular falls back
+  // to CSR even when the request reaches this SSR handler. Keep host validation.
+  trustProxyHeaders: ['x-forwarded-host', 'x-forwarded-proto', 'x-forwarded-for'],
   allowedHosts: process.env['VERCEL_URL'] ? [process.env['VERCEL_URL']] : [],
 });
 
